@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About - Parkinson's Detection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+<!-- Lottie Player Script (REQUIRED) -->
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <style>
+    @keyframes fade-in {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 1s ease-out;
+}
+
+    body {
+      background: linear-gradient(145deg, #110066, #1f0033);
+      overflow-x: hidden;
+    }
+    .glow-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 1.5rem;
+      box-shadow: 0 0 30px #8e2de2;
+      transition: all 0.4s ease;
+    }
+    .glow-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 40px #ff00cc, 0 0 60px #8e2de2;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    @keyframes pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.animate-pop {
+  animation: pop 0.6s ease-out forwards;
+}
+
+  </style>
+</head>
+<body class="text-white font-sans">
+
+  <!-- Background 3D animation -->
+  <canvas id="stars"></canvas>
+
+  <!-- Header -->
+  <div class="text-center mt-12">
+    <h1 class="text-5xl font-bold animate-pulse text-purple-300 drop-shadow-xl">
+      About Our Detection System
+    </h1>
+    <p class="text-lg mt-4 text-purple-100 opacity-90 max-w-2xl mx-auto">
+      Explore how our futuristic AI system detects Parkinson’s from your voice, spiral drawings, and posture — with elegance and precision.
+    </p>
+  </div>
+ <!-- About Description Card -->
+<div class="max-w-4xl mx-auto mt-16 p-6 bg-white bg-opacity-5 backdrop-blur-md border border-white border-opacity-10 rounded-2xl shadow-xl text-purple-100 animate-pop">
+  <h2 class="text-2xl font-semibold mb-4 text-purple-200 flex items-center gap-2">
+    🌐 About Our Parkinson’s Detection System
+  </h2>
+  <p class="leading-relaxed text-sm md:text-base">
+    Our Parkinson’s Detection System is an advanced AI-powered web application designed to assist in the early diagnosis and monitoring of Parkinson’s disease using multiple biometric inputs.
+    <br><br>
+    The goal is to provide accessible, non-invasive, and intelligent tools that help doctors and individuals identify signs of the disease at an early stage.
+  </p>
+
+  <h3 class="mt-6 text-lg font-semibold text-yellow-300 flex items-center gap-2">
+    💡 Key Features
+  </h3>
+  <ul class="mt-2 list-disc list-inside space-y-2 text-sm md:text-base">
+    <li>🧠 <strong>Voice Detection:</strong> Uses signal processing and machine learning to analyze speech patterns and detect subtle vocal changes associated with Parkinson’s.</li>
+    <li>✍️ <strong>Spiral Drawing Analysis:</strong> Evaluates smoothness and tremor intensity in hand-drawn spirals using AI-driven image recognition.</li>
+    <li>🕺 <strong>Posture & Movement Detection:</strong> Uses deep learning-based video analysis to assess posture, gait, and movement abnormalities.</li>
+  </ul>
+</div>
+
+  <!-- Lottie Animation -->
+  <div id="lottie" class="w-72 h-72 mx-auto mt-12"></div>
+  <script>
+    lottie.loadAnimation({
+      container: document.getElementById('lottie'),
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      path: "{% static 'animations/about.json' %}"  // Replace with your Lottie JSON file path
+    });
+  </script>
+  <!-- 👾 Beautiful Lottie Characters Above Cards -->
+<div class="w-full flex justify-center gap-12 mb-[-30px] animate-fade-in">
+  <lottie-player src="https://assets7.lottiefiles.com/packages/lf20_1pxqjqps.json" background="transparent" speed="1"
+    style="width: 140px; height: 140px;" loop autoplay></lottie-player>
+
+  <lottie-player src="https://assets7.lottiefiles.com/packages/lf20_1pxqjqps.json" background="transparent" speed="1"
+    style="width: 140px; height: 140px;" loop autoplay></lottie-player>
+
+  <lottie-player src="https://assets5.lottiefiles.com/packages/lf20_3vbOcw.json" background="transparent" speed="1"
+    style="width: 140px; height: 140px;" loop autoplay></lottie-player>
+</div>
+
+
+  <!-- Cards Section -->
+  <div class="grid md:grid-cols-3 gap-8 px-10 mt-16">
+    <div class="glow-card p-6">
+      <h2 class="text-xl font-bold text-pink-400">Voice Detection</h2>
+      <p class="mt-2 text-sm text-purple-100">Analyzes subtle changes in speech patterns using signal processing and machine learning.</p>
+    </div>
+    <div class="glow-card p-6">
+      <h2 class="text-xl font-bold text-yellow-300">Spiral Drawing</h2>
+      <p class="mt-2 text-sm text-purple-100">Examines drawing smoothness and tremor intensity through AI-powered image analysis.</p>
+    </div>
+    <div class="glow-card p-6">
+      <h2 class="text-xl font-bold text-green-300">Posture Detection</h2>
+      <p class="mt-2 text-sm text-purple-100">Evaluates movement and posture from video using deep learning pose estimation models.</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="text-center mt-20 text-sm text-purple-300">
+    © 2025 Parkinson Detection AI System
+  </div>
+
+  <!-- Animated Star Canvas -->
+  <script>
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const stars = Array(150).fill().map(() => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 1.2,
+      speed: Math.random() * 0.6 + 0.2
+    }));
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ffffff";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+        star.y += star.speed;
+        if (star.y > canvas.height) star.y = 0;
+      });
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+
+</body>
+</html>

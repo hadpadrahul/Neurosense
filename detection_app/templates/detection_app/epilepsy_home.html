@@ -1,0 +1,144 @@
+{% extends "detection_app/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto py-10">
+
+    <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+        Epilepsy Screening Module
+    </h1>
+    <p class="text-gray-600 mb-6">
+        This is a <span class="font-semibold">screening questionnaire</span> to estimate epilepsy risk based on symptoms,
+        family history and triggers. It is <span class="font-semibold">not</span> a final diagnosis, but helps decide
+        whether a person should be referred to a specialist.
+    </p>
+
+    <form method="post" class="bg-white rounded-2xl shadow-lg p-6 space-y-5">
+        {% csrf_token %}
+
+        <!-- Q1 -->
+        <div>
+            <p class="font-semibold text-gray-800 mb-1">
+                1. Has the person ever had episodes of sudden fainting, blackouts, or unexplained collapses?
+            </p>
+            <div class="flex gap-4 text-sm text-gray-700">
+                <label><input type="radio" name="q1" value="yes" required> Yes</label>
+                <label><input type="radio" name="q1" value="no"> No</label>
+            </div>
+        </div>
+
+        <!-- Q2 -->
+        <div>
+            <p class="font-semibold text-gray-800 mb-1">
+                2. During any episode, has anyone noticed jerking or stiffening of the arms, legs or whole body?
+            </p>
+            <div class="flex gap-4 text-sm text-gray-700">
+                <label><input type="radio" name="q2" value="yes" required> Yes</label>
+                <label><input type="radio" name="q2" value="no"> No</label>
+            </div>
+        </div>
+
+        <!-- Q3 -->
+        <div>
+            <p class="font-semibold text-gray-800 mb-1">
+                3. Is there a family history of epilepsy or repeated seizures?
+            </p>
+            <div class="flex gap-4 text-sm text-gray-700">
+                <label><input type="radio" name="q3" value="yes" required> Yes</label>
+                <label><input type="radio" name="q3" value="no"> No</label>
+            </div>
+        </div>
+
+        <!-- Q4 -->
+        <div>
+            <p class="font-semibold text-gray-800 mb-1">
+                4. Do these episodes often happen after lack of sleep, extreme stress, or missed meals?
+            </p>
+            <div class="flex gap-4 text-sm text-gray-700">
+                <label><input type="radio" name="q4" value="yes" required> Yes</label>
+                <label><input type="radio" name="q4" value="no"> No</label>
+            </div>
+        </div>
+
+        <!-- Q5 -->
+        <div>
+            <p class="font-semibold text-gray-800 mb-1">
+                5. After an episode, does the person feel confused, very tired, or unable to remember what happened?
+            </p>
+            <div class="flex gap-4 text-sm text-gray-700">
+                <label><input type="radio" name="q5" value="yes" required> Yes</label>
+                <label><input type="radio" name="q5" value="no"> No</label>
+            </div>
+        </div>
+
+        <!-- Q6 -->
+        <div>
+            <p class="font-semibold text-gray-800 mb-1">
+                6. Has there ever been tongue biting or loss of bladder control during an episode?
+            </p>
+            <div class="flex gap-4 text-sm text-gray-700">
+                <label><input type="radio" name="q6" value="yes" required> Yes</label>
+                <label><input type="radio" name="q6" value="no"> No</label>
+            </div>
+        </div>
+
+        <!-- Q7 -->
+        <div>
+            <p class="font-semibold text-gray-800 mb-1">
+                7. Does the person feel unwell (headache, eye strain, dizziness) when watching fast flashing lights or patterns?
+            </p>
+            <div class="flex gap-4 text-sm text-gray-700">
+                <label><input type="radio" name="q7" value="yes" required> Yes</label>
+                <label><input type="radio" name="q7" value="no"> No</label>
+            </div>
+        </div>
+
+        <!-- Q8 -->
+        <div>
+            <p class="font-semibold text-gray-800 mb-1">
+                8. Is the person currently taking anti-seizure (anti-epileptic) medicines prescribed by a doctor?
+            </p>
+            <div class="flex gap-4 text-sm text-gray-700">
+                <label><input type="radio" name="q8" value="yes" required> Yes</label>
+                <label><input type="radio" name="q8" value="no"> No</label>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-4">
+            <a href="{% url 'assessment_home' %}" class="text-sm text-gray-500 hover:underline">
+                ← Back to Assessment Selection
+            </a>
+            <button type="submit" class="btn-primary">
+                Calculate Epilepsy Risk
+            </button>
+        </div>
+    </form>
+
+    {% if score is not None %}
+        <div class="mt-8 bg-white rounded-2xl shadow-lg p-6">
+            <p class="text-xs uppercase tracking-wide text-gray-500 font-semibold">
+                Screening Result
+            </p>
+            <p class="mt-1 text-3xl font-extrabold text-purple-700">
+                Total Score: {{ score }}
+            </p>
+            <p class="mt-2 text-lg font-semibold text-gray-900">
+                {{ risk_level }}
+            </p>
+            <p class="mt-2 text-sm text-gray-700">
+                {{ advice }}
+            </p>
+
+            <div class="mt-4 border-t pt-4">
+                <h3 class="text-sm font-semibold text-gray-800 mb-1">
+                    Important:
+                </h3>
+                <p class="text-xs text-gray-600">
+                    This tool is for preliminary screening only and cannot replace a full medical diagnosis.
+                    Any moderate or high risk result should be discussed with a qualified doctor or neurologist.
+                </p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

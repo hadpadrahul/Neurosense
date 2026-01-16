@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spiral Drawing Test Report</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #1b1f3b, #0b0d1a);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* ===== A4 PAGE ===== */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      color: #ffffff;
+      padding: 25mm 22mm;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 26px;
+      margin-bottom: 6px;
+      color: #ffd166;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 30px;
+      color: #d0d0d0;
+    }
+
+    .section {
+      margin-bottom: 26px;
+    }
+
+    .section h3 {
+      font-size: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      color: #ffd166;
+    }
+
+    .info {
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .result-box {
+      border: 2px solid #ffd166;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 12px;
+      background: rgba(255,209,102,0.1);
+    }
+
+    img {
+      width: 100%;
+      max-height: 260px;
+      object-fit: contain;
+      border: 1px solid #ffd166;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .note {
+      font-size: 14px;
+      line-height: 1.8;
+      background: rgba(255,255,255,0.08);
+      padding: 14px;
+      border-left: 4px solid #ffd166;
+      border-radius: 8px;
+    }
+
+    /* ===== MAP ===== */
+    .map-container {
+      width: 100%;
+      height: 280px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 10px 26px;
+      font-size: 14px;
+      border-radius: 30px;
+      border: none;
+      background: #ffd166;
+      color: #000;
+      cursor: pointer;
+      margin: 5px;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: 600;
+    }
+
+    /* ===== PRINT SETTINGS ===== */
+    @media print {
+      body { background: white; }
+      .page {
+        background: white;
+        color: black;
+        box-shadow: none;
+        margin: 0;
+        border-radius: 0;
+      }
+      h1, .section h3 { color: black; }
+      .note, .result-box {
+        color: black;
+        background: #f3f3f3;
+        border-color: black;
+      }
+      .actions,
+      .map-container {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <h1>Spiral Drawing Test Report</h1>
+  <div class="subtitle">Basic Hand Movement Screening</div>
+
+  <!-- Test Info -->
+  <div class="section">
+    <h3>Test Details</h3>
+    <div class="info">
+      <strong>Date:</strong> {% now "d M Y, h:i A" %}<br>
+      <strong>Test Type:</strong> Spiral Drawing Test
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="section">
+    <h3>Your Result</h3>
+    <div class="result-box">
+      {{ result }}
+    </div>
+  </div>
+
+  <!-- Uploaded Image (FOR BOTH CASES) -->
+  {% if image_url %}
+  <div class="section">
+    <h3>Your Uploaded Spiral Drawing</h3>
+    <img src="{{ image_url }}" alt="Spiral Drawing">
+  </div>
+  {% endif %}
+
+  <!-- CONDITIONAL CONTENT -->
+  {% if "Parkinson" in result %}
+
+    <!-- Parkinson Info -->
+    <div class="section">
+      <h3>What Does This Mean?</h3>
+      <div class="note">
+        Your spiral drawing shows patterns that may be associated with
+        movement-related difficulties.
+        <br><br>
+        <strong>This is only a screening result.</strong>
+        It does not confirm a medical diagnosis.
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>What Should You Do Next?</h3>
+      <div class="note">
+        We strongly recommend that you consult a
+        <strong>qualified doctor or neurologist</strong>
+        for further medical evaluation and guidance.
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Find a Doctor Near You</h3>
+      <div class="map-container">
+        <iframe
+          src="https://www.google.com/maps?q=neurologist+near+me&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+
+  {% else %}
+
+    <!-- Healthy Message -->
+    <div class="section">
+      <h3>Message</h3>
+      <div class="note">
+        Your spiral drawing appears normal.
+        No signs of movement-related issues were detected in this test.
+        <br><br>
+        Maintain a healthy lifestyle and consult a doctor
+        if you notice any symptoms in the future.
+      </div>
+    </div>
+
+  {% endif %}
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn" onclick="window.print()">Print / Save Report</button>
+    <a href="{% url 'spiral_detection_view' %}" class="btn">Test Again</a>
+  </div>
+
+</div>
+
+</body>
+</html>

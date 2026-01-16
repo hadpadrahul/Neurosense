@@ -1,0 +1,184 @@
+{% extends "detection_app/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    {% if not completed %}
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+            Word Memory – Recall Phase
+        </h1>
+        <p class="text-gray-600 mb-4">
+            Ask the patient to recall as many of the words as possible. Tap each word the patient remembers.
+        </p>
+
+        <form method="post" class="bg-white rounded-2xl shadow-lg p-6" id="recall-form">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Recalled words (tap to select)
+                </label>
+
+                <div id="words-select" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    {% for w in words %}
+                    <button type="button"
+                            class="word-chip inline-flex items-center gap-2 cursor-pointer select-none px-3 py-2 rounded-2xl border
+                                   border-gray-200 bg-white hover:bg-purple-50 transition text-sm font-semibold text-gray-800"
+                            data-value="{{ w }}">
+                        <svg class="check-icon hidden w-4 h-4 text-green-600 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{{ w|title }}</span>
+                    </button>
+                    {% endfor %}
+                </div>
+
+                <p class="mt-2 text-xs text-gray-500">
+                    Selected words will be used for scoring. Tap a word to select or tap again to unselect.
+                </p>
+            </div>
+
+            <!-- hidden inputs for selected words -->
+            <div id="selected-inputs"></div>
+
+            <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+                <p class="text-xs text-gray-500">
+                    Don’t give hints; let the patient recall freely.
+                </p>
+                <button type="submit" class="btn-primary">
+                    Calculate Memory Score
+                </button>
+            </div>
+        </form>
+    {% else %}
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+            Word Memory – Results
+        </h1>
+
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <p class="text-xs uppercase tracking-wide text-gray-500 font-semibold">
+                Overall Memory Performance
+            </p>
+            <p class="mt-1 text-4xl font-extrabold text-purple-700">
+                {{ score_percent }}%
+            </p>
+            <p class="mt-2 text-sm text-gray-700">
+                Correctly recalled {{ correct_count }} of {{ total_target }} target words.
+                Memory Score: <span class="font-semibold">{{ memory_score }}/10</span>
+            </p>
+            <p class="mt-2 text-sm font-semibold text-gray-800">
+                {{ level }}
+            </p>
+            <p class="mt-1 text-sm text-gray-600">
+                {{ interpretation }}
+            </p>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 mb-6">
+            <div class="bg-gray-50 rounded-2xl p-4">
+                <h2 class="text-sm font-semibold text-gray-800 mb-2">
+                    Target Word List
+                </h2>
+                <p class="text-sm text-gray-700">
+                    {% for w in words %}
+                        <span class="inline-block px-2 py-1 bg-purple-50 rounded-full text-xs font-semibold text-purple-800 mr-1 mb-1">
+                            {{ w|title }}
+                        </span>
+                    {% endfor %}
+                </p>
+            </div>
+            <div class="bg-gray-50 rounded-2xl p-4">
+                <h2 class="text-sm font-semibold text-gray-800 mb-2">
+                    Patient’s Recalled Words
+                </h2>
+                <p class="text-sm text-gray-700 whitespace-pre-line">
+                    {{ raw_input }}
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow p-4 mb-6">
+            <h3 class="text-sm font-semibold text-gray-800 mb-2">Breakdown</h3>
+            <p class="text-sm text-gray-700">
+                ✅ Correctly recalled:
+                {% if correct_hits %}
+                    {{ correct_hits|join:", " }}
+                {% else %}
+                    None
+                {% endif %}
+            </p>
+            <p class="text-sm text-gray-700 mt-1">
+                ❌ Extra/incorrect words:
+                {% if incorrect_hits %}
+                    {{ incorrect_hits|join:", " }}
+                {% else %}
+                    None
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+            <a href="{% url 'word_memory_show' %}" class="btn-quiz">
+                Retake Word Memory Test
+            </a>
+            <a href="{% url 'alz_summary' %}" class="btn-secondary">
+                View Alzheimer’s Risk Summary
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+(function() {
+  const chips = Array.from(document.querySelectorAll('.word-chip'));
+  const inputsDiv = document.getElementById('selected-inputs');
+
+  // Map to keep track of selected values -> hidden input element
+  const selectedMap = new Map();
+
+  function createHiddenInput(value) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'recalled_select';
+    input.value = value;
+    return input;
+  }
+
+  function toggleSelect(value, chipEl) {
+    const key = value.toString().trim();
+    if (selectedMap.has(key)) {
+      // unselect
+      const inp = selectedMap.get(key);
+      inp.remove();
+      selectedMap.delete(key);
+      chipEl.classList.remove('bg-purple-50','border-purple-200');
+      chipEl.querySelector('.check-icon').classList.add('hidden');
+    } else {
+      // select
+      const hidden = createHiddenInput(key);
+      inputsDiv.appendChild(hidden);
+      selectedMap.set(key, hidden);
+      chipEl.classList.add('bg-purple-50','border-purple-200');
+      chipEl.querySelector('.check-icon').classList.remove('hidden');
+    }
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      const val = chip.getAttribute('data-value');
+      toggleSelect(val, chip);
+    });
+
+    // keyboard access
+    chip.setAttribute('tabindex', '0');
+    chip.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const val = chip.getAttribute('data-value');
+        toggleSelect(val, chip);
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

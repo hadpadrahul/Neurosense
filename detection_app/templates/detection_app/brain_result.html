@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Brain Scan Result</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #0f0c29;
+      overflow: hidden;
+      height: 100vh;
+      color: #fff;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .bg-gradient {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 50%, rgba(255, 20, 147, 0.4), transparent 50%),
+                  radial-gradient(circle at 70% 50%, rgba(0, 255, 255, 0.3), transparent 60%);
+      background-size: 200% 200%;
+      animation: bgShift 20s ease-in-out infinite alternate;
+      mix-blend-mode: screen;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .result-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 22px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(15px);
+      text-align: center;
+      position: relative;
+      animation: floatCard 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatCard {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-10px); }
+    }
+
+    .result-card::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      background: linear-gradient(45deg, #ff0080, #00ffe7, #ff9f1c, #7928ca);
+      background-size: 400% 400%;
+      animation: borderShift 5s ease infinite;
+      z-index: 0;
+      filter: blur(10px);
+      opacity: 0.3;
+      border-radius: 25px;
+    }
+
+    @keyframes borderShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h2 {
+      font-size: 28px;
+      color: #ffd166;
+      z-index: 2;
+      position: relative;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 15px;
+      margin: 20px 0;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      position: relative;
+      z-index: 2;
+    }
+
+    .result-text {
+      font-size: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 15px;
+      color: #fff;
+      margin-bottom: 20px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 25px;
+      background: #ffd166;
+      color: #333;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.3s ease, transform 0.2s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn:hover {
+      background: #ff9f1c;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <!-- Back to Home Top-Left -->
+<!-- Back to Assessment Options Button -->
+<a href="{% url 'assessment_options' %}" style="
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 999;
+  background-color: #FFD166;
+  padding: 10px 20px;
+  border-radius: 30px;
+  color: black;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+  ⬅ Back to Assessments
+</a>
+  <div class="bg-gradient"></div>
+  <canvas id="vortex"></canvas>
+
+  <div class="container">
+    <div class="result-card">
+  {% if result %}
+    <h2 class="result-heading">Prediction Result</h2>
+    <p class="result-text">{{ result }}</p>
+  {% else %}
+    <h2 class="result-heading" style="color: orange;">Brain Scan Result</h2>
+    <p class="result-text" style="color: red;">{{ error }}</p>
+  {% endif %}
+
+  {% if image %}
+    <img src="/media/{{ image }}" alt="Uploaded MRI Image" style="max-width: 300px; margin-top: 20px; border-radius: 12px;">
+  {% endif %}
+
+  <a href="{% url 'brain_upload' %}" class="btn btn-warning" style="margin-top: 20px;">Try Another Scan</a>
+</div>
+
+
+  <script>
+    const canvas = document.getElementById("vortex");
+    const ctx = canvas.getContext("2d");
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
+    const points = [];
+    const numPoints = 80;
+
+    for (let i = 0; i < numPoints; i++) {
+      points.push({
+        x: (i / numPoints) * w,
+        y: h / 2,
+        vy: Math.random() * 2 - 1
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      for (let i = 0; i < points.length; i++) {
+        points[i].y += points[i].vy;
+        if (points[i].y < h / 2 - 80 || points[i].y > h / 2 + 80) {
+          points[i].vy *= -1;
+        }
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      const gradient = ctx.createLinearGradient(0, 0, w, h);
+      gradient.addColorStop(0, "rgba(255, 0, 128, 0.1)");
+      gradient.addColorStop(0.5, "rgba(0, 255, 255, 0.1)");
+      gradient.addColorStop(1, "rgba(255, 255, 255, 0.05)");
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener("resize", () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    });
+  </script>
+
+</body>
+</html>
