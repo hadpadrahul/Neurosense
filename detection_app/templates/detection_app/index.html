@@ -217,8 +217,8 @@
         <a href="{% url 'home' %}" class="navbar-brand">NeuroSense</a>
         <nav class="navbar-links">
             <a href="{% url 'home' %}" class="font-bold text-purple-700">Home</a>
-             <a href="{% url 'assessment_home' %}">Assessment Home</a>
-            <a href="{% url 'assessment_options' %}">Assessment</a>
+             <!-- <a href="#">Assessment Home</a> -->
+            <!-- <a href="#">Assessment</a> -->
             <a href="#">About</a>
             <a href="#">Contact</a> 
             <a href="{% url 'assessment_history' %}">History</a>
@@ -277,9 +277,8 @@
 
   <!-- ✅ BUTTONS SECTION -->
   
-      <a href="{% url 'assessment_options' %}" class="btn-primary inline-block">Start Assessment</a>
-    <!-- Take Quiz Button -->
-    <a href="/quiz" class="bg-yellow-400 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-yellow-500 transition">
+      <!-- Take Quiz Button -->
+    <a href="{% url 'quiz' %}" class="bg-yellow-400 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-yellow-500 transition">
       Take Quiz
     </a>
 
@@ -316,47 +315,62 @@
             </p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 
-
                 <!-- Spiral Drawing Card -->
-                <div class="card">
-                    <div class="text-purple-700 text-5xl mb-4">✍️</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Spiral Drawing</h3>
-                    <p class="text-gray-600 mb-4">
-                        Evaluates hand tremors and motor control by assessing the smoothness and consistency of spiral drawings.
-                    </p>
-                    <ul class="text-left text-gray-500 text-sm space-y-1">
-                        <li>• Tremor amplitude measurement</li>
-                        <li>• Line consistency</li>
-                        <li>• Line movement reduction</li>
-                    </ul>
-                </div>
+                <a href="{% url 'spiral_view' %}" class="block transform hover:scale-105 transition-transform duration-300">
+                    <div class="card h-full cursor-pointer hover:shadow-2xl border-2 border-transparent hover:border-purple-300">
+                        <div class="text-purple-700 text-5xl mb-4">✍️</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Spiral Drawing</h3>
+                        <p class="text-gray-600 mb-4">
+                            Evaluates hand tremors and motor control by assessing the smoothness and consistency of spiral drawings.
+                        </p>
+                        <ul class="text-left text-gray-500 text-sm space-y-1">
+                            <li>• Tremor amplitude measurement</li>
+                            <li>• Line consistency</li>
+                            <li>• Line movement reduction</li>
+                        </ul>
+                        <div class="mt-4 text-purple-600 font-semibold flex items-center">
+                            Start Test <span class="ml-2">→</span>
+                        </div>
+                    </div>
+                </a>
+
                 <!-- Speech Analysis Card -->
-                <div class="card">
-                    <div class="text-purple-700 text-5xl mb-4">🎤</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Voice Analysis</h3>
-                    <p class="text-gray-600 mb-4">
-                        Analyzes vocal tremors, speech rhythm, and articulation patterns to help indicate early Parkinson's symptoms.
-                    </p>
-                    <ul class="text-left text-gray-500 text-sm space-y-1">
-                        <li>• Voice tremor detection</li>
-                        <li>• Speech rhythm analysis</li>
-                        <li>• Articulation clarity</li>
-                    </ul>
-                </div>
+                 <a href="{% url 'voice_upload' %}" class="block transform hover:scale-105 transition-transform duration-300">
+                    <div class="card h-full cursor-pointer hover:shadow-2xl border-2 border-transparent hover:border-purple-300">
+                        <div class="text-purple-700 text-5xl mb-4">🎤</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Voice Analysis</h3>
+                        <p class="text-gray-600 mb-4">
+                            Analyzes vocal tremors, speech rhythm, and articulation patterns to help indicate early Parkinson's symptoms.
+                        </p>
+                        <ul class="text-left text-gray-500 text-sm space-y-1">
+                            <li>• Voice tremor detection</li>
+                            <li>• Speech rhythm analysis</li>
+                            <li>• Articulation clarity</li>
+                        </ul>
+                        <div class="mt-4 text-purple-600 font-semibold flex items-center">
+                            Start Test <span class="ml-2">→</span>
+                        </div>
+                    </div>
+                </a>
 
                 <!-- Brain Scan Card -->
-                <div class="card">
-                <div class="text-purple-700 text-5xl mb-4">🧠</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">Brain Scan</h3>
-                <p class="text-gray-600 mb-4">
-                Deep learning models analyze MRI brain scans to identify structural and functional changes linked to Parkinson’s disease.
-                </p>
-                <ul class="text-left text-gray-500 text-sm space-y-1">
-                 <li>• Slice-wise MRI analysis</li>
-                <li>• Structural pattern recognition</li>
-                 <li>• Early biomarker detection</li>
-              </ul>
-                </div>
+                 <a href="{% url 'brain_view' %}" class="block transform hover:scale-105 transition-transform duration-300">
+                    <div class="card h-full cursor-pointer hover:shadow-2xl border-2 border-transparent hover:border-purple-300">
+                        <div class="text-purple-700 text-5xl mb-4">🧠</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Brain Scan</h3>
+                        <p class="text-gray-600 mb-4">
+                            Deep learning models analyze MRI brain scans to identify structural and functional changes linked to Parkinson’s disease.
+                        </p>
+                        <ul class="text-left text-gray-500 text-sm space-y-1">
+                            <li>• Slice-wise MRI analysis</li>
+                            <li>• Structural pattern recognition</li>
+                            <li>• Early biomarker detection</li>
+                        </ul>
+                        <div class="mt-4 text-purple-600 font-semibold flex items-center">
+                            Start Test <span class="ml-2">→</span>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
@@ -414,7 +428,7 @@
             </p>
             <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
                 {# "Start Assessment" button no longer directly links to quiz #}
-              <a href="{% url 'spiral_detection_view' %}" class="btn-primary inline-block">Start Assessment</a>
+              <a href="{% url 'spiral_view' %}" class="btn-primary inline-block">Start Assessment</a>
 
                 
                 {# NEW: "Take Quiz" button #}

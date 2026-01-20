@@ -33,8 +33,9 @@ def is_valid_spiral(image_path):
     circularity = (4 * np.pi * area) / (perimeter ** 2)
     
     # Reject retina-like patterns based on color/texture
-    if np.mean(img) > 200:  # Too bright
-         return False
+    # Removed brightness check as it was rejecting valid white paper drawings
+    # if np.mean(img) > 200:  # Too bright
+    #      return False
     if np.std(img) < 10:    # Very low variance (no edges or structure)
          return False
 
@@ -43,4 +44,5 @@ def is_valid_spiral(image_path):
     print(f"[DEBUG] Spiral validation: Area={area}, Perimeter={perimeter}, Circularity={circularity:.2f}")
 
     # Relaxed ranges to allow imperfect spirals (drawn by hand)
-    return area > 1000 and circularity > 0.05
+    # Spirals have low circularity, so we lower the threshold significantly
+    return area > 500 and circularity > 0.001

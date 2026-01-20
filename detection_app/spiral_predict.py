@@ -16,12 +16,18 @@ def _get_model():
     try:
         keras = importlib.import_module('tensorflow.keras')
         load_model = getattr(keras.models, 'load_model')
-        model_path = os.path.join(os.path.dirname(__file__), 'spiral_model.h5')
+        # Updated to use the recovered Keras 3 compatible model
+        model_path = os.path.join(os.path.dirname(__file__), 'spiral_model.keras')
         if os.path.exists(model_path):
-            _model = load_model(model_path)
+            # compile=False is safer for inference, especially with custom metrics/losses
+            _model = load_model(model_path, compile=False)
         else:
+            print(f"[ERROR] Spiral model file not found at {model_path}")
             _model = None
-    except Exception:
+    except Exception as e:
+        print(f"[ERROR] Failed to load spiral_model.keras: {e}")
+        # import traceback
+        # traceback.print_exc()
         _model = None
     return _model
 

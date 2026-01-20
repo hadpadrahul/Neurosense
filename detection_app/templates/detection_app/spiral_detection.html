@@ -173,11 +173,11 @@
 <body>
 
 <!-- Back Button -->
-<a href="{% url 'assessment_options' %}" style="
+<a href="{% url 'home' %}" style="
   position:absolute; top:20px; left:20px; z-index:999;
   background:#FFD166; padding:10px 20px; border-radius:30px;
   color:black; text-decoration:none; font-weight:600;">
-  ⬅ Back to Assessments
+  ⬅ Back to Home
 </a>
 
 <canvas id="vortex"></canvas>
@@ -191,7 +191,7 @@
     </div>
 
     <form method="POST" enctype="multipart/form-data"
-          action="{% url 'spiral_upload_view' %}"
+          action="{% url 'spiral_view' %}"
           onsubmit="startLoading()">
       {% csrf_token %}
 

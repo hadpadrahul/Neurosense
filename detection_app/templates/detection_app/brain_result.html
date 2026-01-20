@@ -138,8 +138,8 @@
 </head>
 <body>
   <!-- Back to Home Top-Left -->
-<!-- Back to Assessment Options Button -->
-<a href="{% url 'assessment_options' %}" style="
+<!-- Back to Home Button -->
+<a href="{% url 'home' %}" style="
   position: absolute;
   top: 20px;
   left: 20px;
@@ -153,7 +153,7 @@
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-  ⬅ Back to Assessments
+  ⬅ Back to Home
 </a>
   <div class="bg-gradient"></div>
   <canvas id="vortex"></canvas>
@@ -172,7 +172,7 @@
     <img src="/media/{{ image }}" alt="Uploaded MRI Image" style="max-width: 300px; margin-top: 20px; border-radius: 12px;">
   {% endif %}
 
-  <a href="{% url 'brain_upload' %}" class="btn btn-warning" style="margin-top: 20px;">Try Another Scan</a>
+  <a href="{% url 'brain_view' %}" class="btn btn-warning" style="margin-top: 20px;">Try Another Scan</a>
 </div>
 
 

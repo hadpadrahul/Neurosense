@@ -178,7 +178,23 @@
   {% endif %}
 
   <!-- CONDITIONAL CONTENT -->
-  {% if "Parkinson" in result %}
+  {% if "Invalid" in result or "Error" in result or "Not Loaded" in result %}
+
+    <!-- Invalid / Error / Model Failure Message -->
+    <div class="section">
+      <h3>Message</h3>
+      <div class="note" style="border-left-color: #ff4d4d; background: rgba(255, 77, 77, 0.1);">
+        {{ result }}
+        <br><br>
+        {% if "Not Loaded" in result %}
+          The analysis system is currently unavailable. Please contact support.
+        {% else %}
+          Please try uploading a clear image of a spiral drawing again.
+        {% endif %}
+      </div>
+    </div>
+
+  {% elif "Parkinson" in result %}
 
     <!-- Parkinson Info -->
     <div class="section">
@@ -231,7 +247,7 @@
   <!-- Actions -->
   <div class="actions">
     <button class="btn" onclick="window.print()">Print / Save Report</button>
-    <a href="{% url 'spiral_detection_view' %}" class="btn">Test Again</a>
+    <a href="{% url 'spiral_view' %}" class="btn">Test Again</a>
   </div>
 
 </div>

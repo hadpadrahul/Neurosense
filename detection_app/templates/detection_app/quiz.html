@@ -390,7 +390,7 @@
     <main>
         <div class="quiz-container">
             <h1 class="quiz-title">Parkinson's Assessment Quiz</h1>
-            <form id="quizForm" method="post" action="{% url 'upload_assessment' %}">
+            <form id="quizForm" method="post" action="{% url 'quiz_result' %}">
                 {% csrf_token %}
 
                 {# FIXED LINE BELOW: Changed to unpack only one variable as 'question_pages' is a list of lists #}

@@ -134,7 +134,8 @@
 <body>
 
 <!-- Back to Assessment Options Button -->
-<a href="{% url 'assessment_options' %}" style="
+<!-- Back to Home Button -->
+<a href="{% url 'home' %}" style="
   position: absolute;
   top: 20px;
   left: 20px;
@@ -148,7 +149,7 @@
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
 " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-  ⬅ Back to Assessments
+  ⬅ Back to Home
 </a>
 
 <canvas id="vortex"></canvas>
@@ -166,7 +167,7 @@
       {% endfor %}
     {% endif %}
 
-    <form method="POST" enctype="multipart/form-data" action="{% url 'brain_upload' %}">
+    <form method="POST" enctype="multipart/form-data" action="{% url 'brain_view' %}">
       {% csrf_token %}
       <div class="file-input">
         <input type="file" name="brain_image" accept="image/png, image/jpeg" required>

@@ -24,15 +24,7 @@ from .serializers import (
     SpiralAssessmentResultSerializer,
     SpeechAssessmentResultSerializer,
     BrainScanResultSerializer,
-    UnifiedHistorySerializer,
-    EpilepsyAssessmentSerializer,
-    AlzheimerMRIRequestSerializer,
-    AlzheimerMRIResponseSerializer,
-    AlzEmotionScoreRequestSerializer,
-    AlzWordScoreRequestSerializer,
-    AlzFluencyRequestSerializer,
-    AlzSpeechRequestSerializer,
-    AlzSummaryRequestSerializer
+    UnifiedHistorySerializer
 )
 from .services.prediction_service import (
     predict_quiz, 
@@ -41,14 +33,6 @@ from .services.prediction_service import (
     predict_voice_wrapper,
     predict_brain_wrapper,
     is_valid_mri_wrapper
-)
-from .services.epilepsy_service import assess_epilepsy_risk
-from .services.alz_mri_service import predict_alz_mri
-from .services.alz_interactive_service import (
-    get_emotion_config, score_emotion_test,
-    get_word_config, score_word_test,
-    score_fluency, score_speech_coherence,
-    get_aeri_summary
 )
 
 # ----------------- Quiz Assessment -----------------
@@ -238,65 +222,7 @@ class BrainAssessmentAPIView(APIView):
 
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# ----------------- Epilepsy Assessment -----------------
-
-class EpilepsyAssessmentAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser]
-    
-    def post(self, request, *args, **kwargs):
-        # Allow default false values, so input can be sparse
-        serializer = EpilepsyAssessmentSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        # Pass validated data to service (logic extracted from views.py)
-        result = assess_epilepsy_risk(serializer.validated_data)
-        
-        # Return combined struct
-        return Response(result, status=status.HTTP_200_OK)
-
-# ----------------- Alzheimer MRI Assessment -----------------
-
-class AlzMRIAssessmentAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
-    
-    def post(self, request, *args, **kwargs):
-        if 'image' not in request.FILES:
-             return Response({"error": "No image provided"}, status=status.HTTP_400_BAD_REQUEST)
-             
-        uploaded_file = request.FILES['image']
-        
-        # We need to save the file to disk for the model to read it, 
-        # mirroring the web view logic which saves to settings.MEDIA_ROOT/detection_uploads (or alz_mri_scans)
-        
-        # The service expects an absolute file path.
-        # We'll use a temp save logic similar to the view's "debug" logic or standard file storage
-        
-        try:
-            # Replicating the storage logic from detection_app/views.py (Definition 2)
-            # "upload_dir = Path(settings.MEDIA_ROOT) / 'detection_uploads'"
-            upload_dir = Path(settings.MEDIA_ROOT) / "detection_uploads"
-            upload_dir.mkdir(parents=True, exist_ok=True)
-            
-            # Use specific name pattern or keep original
-            filename = f"api_alz_mri_{uploaded_file.name}"
-            abs_path = str(upload_dir / filename)
-            
-            with open(abs_path, "wb") as f:
-                for chunk in uploaded_file.chunks():
-                    f.write(chunk)
-            
-            # Call service (verbatim logic wrapper)
-            result = predict_alz_mri(abs_path)
-            
-            # Serialize response
-            resp_serializer = AlzheimerMRIResponseSerializer(result)
-            return Response(resp_serializer.data, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+# ----------------- End of API Views -----------------
 
 class UnifiedHistoryAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -329,79 +255,4 @@ class UnifiedHistoryAPIView(generics.ListAPIView):
         serializer = self.get_serializer(combined, many=True)
         return Response(serializer.data)
 
-
-# ----------------- Phase 4: Interactive Alz Views -----------------
-
-class AlzEmotionConfigAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get(self, request):
-        config = get_emotion_config()
-        return Response(config)
-
-class AlzEmotionScoreAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser]
-    
-    def post(self, request):
-        serializer = AlzEmotionScoreRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        result = score_emotion_test(serializer.validated_data['answers'])
-        return Response(result)
-
-class AlzWordConfigAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get(self, request):
-        config = get_word_config()
-        return Response(config)
-
-class AlzWordScoreAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser]
-
-    def post(self, request):
-        serializer = AlzWordScoreRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        result = score_word_test(serializer.validated_data['recalled_text'])
-        return Response(result)
-
-class AlzFluencyScoreAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser]
-
-    def post(self, request):
-        serializer = AlzFluencyRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        # category defaults to 'fruits' in serializer if missing
-        result = score_fluency(
-            serializer.validated_data['raw_text'], 
-            serializer.validated_data.get('category', 'fruits')
-        )
-        return Response(result)
-
-class AlzSpeechScoreAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser]
-
-    def post(self, request):
-        serializer = AlzSpeechRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        result = score_speech_coherence(serializer.validated_data['text'])
-        return Response(result)
-
-class AlzSummaryAPIView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-    parser_classes = [JSONParser]
-
-    def post(self, request):
-        serializer = AlzSummaryRequestSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        result = get_aeri_summary(
-            data['speech_score'], 
-            data['memory_score'], 
-            data['fluency_score']
-        )
-        return Response(result)
 

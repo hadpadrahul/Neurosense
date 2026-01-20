@@ -1,0 +1,76 @@
+{% extends "detection_app/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto py-10">
+
+    <h1 class="text-4xl md:text-5xl font-extrabold text-center text-gray-900 mb-10">
+        NeuroSense – Select Screening Module
+    </h1>
+
+    <p class="text-center text-gray-600 max-w-3xl mx-auto mb-10">
+        Choose the neurological condition you want to screen for.  
+        Each module includes scientifically validated early-detection tests designed for PHCs and caregivers.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- Parkinson's -->
+        <a href="{% url 'assessment_options' %}"
+           class="group bg-white p-8 rounded-3xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100">
+
+        
+
+            <h2 class="text-2xl font-bold text-gray-900 text-center mb-4">Parkinson’s Screening</h2>
+
+            <p class="text-gray-600 text-center">
+                Uses our wearable glove to measure tremors, rigidity, grip strength and bradykinesia using AI.
+            </p>
+
+            <p class="text-center mt-6 text-purple-700 font-semibold group-hover:underline">
+                Start Parkinson’s →
+            </p>
+
+        </a>
+
+
+        <!-- Alzheimer's -->
+        <a href="{% url 'alz_home' %}"
+           class="group bg-white p-8 rounded-3xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100">
+
+        
+
+            <h2 class="text-2xl font-bold text-gray-900 text-center mb-4">Alzheimer’s Screening</h2>
+
+            <p class="text-gray-600 text-center">
+                Includes Speech Coherence Test, Word Recall Test and Category Fluency Test. Generates AERI score.
+            </p>
+
+            <p class="text-center mt-6 text-blue-700 font-semibold group-hover:underline">
+                Start Alzheimer’s →
+            </p>
+
+        </a>
+
+
+        <!-- Epilepsy -->
+        <a href="{% url 'epilepsy_home' %}"  
+           class="group bg-white p-8 rounded-3xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 border border-gray-100">
+
+        
+
+            <h2 class="text-2xl font-bold text-gray-900 text-center mb-4">Epilepsy Screening</h2>
+
+            <p class="text-gray-600 text-center">
+                Risk questionnaire, light-trigger sensitivity test and automatic seizure first-aid plan.
+            </p>
+
+            <p class="text-center mt-6 text-red-600 font-semibold group-hover:underline">
+                Start Epilepsy →
+            </p>
+
+        </a>
+
+    </div>
+</div>
+{% endblock %}

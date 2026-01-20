@@ -121,57 +121,6 @@ class UnifiedHistorySerializer(serializers.Serializer):
             return request.build_absolute_uri(url)
         return url
 
-# ----------------- Epilepsy Serializer -----------------
+# ----------------- End of Serializers -----------------
 
-class EpilepsyAssessmentSerializer(serializers.Serializer):
-    q1 = serializers.BooleanField(required=False, default=False)
-    q2 = serializers.BooleanField(required=False, default=False)
-    q3 = serializers.BooleanField(required=False, default=False)
-    q4 = serializers.BooleanField(required=False, default=False)
-    q5 = serializers.BooleanField(required=False, default=False)
-    q6 = serializers.BooleanField(required=False, default=False)
-    q7 = serializers.BooleanField(required=False, default=False)
-    q8 = serializers.BooleanField(required=False, default=False)
-    
-    # Output fields (read only)
-    score = serializers.IntegerField(read_only=True)
-    risk_level = serializers.CharField(read_only=True)
-    advice = serializers.CharField(read_only=True)
-
-# ----------------- Alzheimer MRI Serializers -----------------
-
-class AlzheimerMRIRequestSerializer(serializers.Serializer):
-    image = serializers.ImageField()
-
-class AlzheimerMRIResponseSerializer(serializers.Serializer):
-    prediction_label = serializers.CharField()
-    prediction_pretty = serializers.CharField()
-    confidence = serializers.FloatField()
-    probabilities = serializers.DictField(child=serializers.FloatField())
-    probabilities = serializers.DictField(child=serializers.FloatField())
-    warnings = serializers.ListField(child=serializers.CharField(), required=False)
-
-# ----------------- Phase 4: Interactive Alz Serializers -----------------
-
-class AlzEmotionAnswerSerializer(serializers.Serializer):
-    image_id = serializers.IntegerField()
-    selected_label = serializers.CharField()
-
-class AlzEmotionScoreRequestSerializer(serializers.Serializer):
-    answers = serializers.ListField(child=AlzEmotionAnswerSerializer())
-
-class AlzWordScoreRequestSerializer(serializers.Serializer):
-    recalled_text = serializers.CharField(allow_blank=True)
-
-class AlzFluencyRequestSerializer(serializers.Serializer):
-    raw_text = serializers.CharField(allow_blank=True)
-    category = serializers.CharField(default="fruits")
-
-class AlzSpeechRequestSerializer(serializers.Serializer):
-    text = serializers.CharField(allow_blank=True)
-
-class AlzSummaryRequestSerializer(serializers.Serializer):
-    speech_score = serializers.FloatField()
-    memory_score = serializers.FloatField()
-    fluency_score = serializers.FloatField()
 
