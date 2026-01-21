@@ -31,7 +31,26 @@ These routes render HTML pages for browser usage.
 **Authentication:** JWT Bearer Token (header `Authorization: Bearer <token>`)
 
 ### Authentication
-#### 1. Obtain Token (Login)
+
+#### 1. Register
+*   **URL:** `/api/v1/register/`
+*   **Method:** `POST`
+*   **Body:**
+    ```json
+    {
+        "username": "newuser",
+        "password": "password123"
+    }
+    ```
+*   **Response (201 Created):**
+    ```json
+    {
+        "user": {"id": 1, "username": "newuser", "email": ""},
+        "message": "User created successfully..."
+    }
+    ```
+
+#### 2. Obtain Token (Login)
 *   **URL:** `/api/v1/token/`
 *   **Method:** `POST`
 *   **Body:**
@@ -49,10 +68,19 @@ These routes render HTML pages for browser usage.
     }
     ```
 
-#### 2. Refresh Token
+#### 3. Refresh Token
 *   **URL:** `/api/v1/token/refresh/`
 *   **Method:** `POST`
 *   **Body:** `{"refresh": "ey..."}`
+*   **Response:** `{"access": "ey_new..."}`
+
+#### 4. Logout
+*   **URL:** `/api/v1/logout/`
+*   **Method:** `POST`
+*   **Headers:** `Authorization: Bearer <token>`
+*   **Body:** `{"refresh": "ey..."}`
+    *(Invalidates the refresh token server-side)*
+
 
 ---
 

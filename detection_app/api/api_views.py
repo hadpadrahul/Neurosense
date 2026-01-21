@@ -19,7 +19,10 @@ from django.core.files.storage import FileSystemStorage
 from pathlib import Path
 import os
 
+from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import (
+    RegistrationSerializer,
+    UserSerializer,
     AssessmentResultSerializer,
     SpiralAssessmentResultSerializer,
     SpeechAssessmentResultSerializer,
@@ -34,6 +37,34 @@ from .services.prediction_service import (
     predict_brain_wrapper,
     is_valid_mri_wrapper
 )
+
+# ----------------- Authentication -----------------
+
+class RegisterAPIView(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = RegistrationSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                "user": UserSerializer(user).data,
+                "message": "User created successfully. Now perform Login to get token",
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 # ----------------- Quiz Assessment -----------------
 

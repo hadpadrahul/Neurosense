@@ -4,7 +4,9 @@ from .api_views import (
     SpiralAssessmentAPIView,
     VoiceAssessmentAPIView,
     BrainAssessmentAPIView,
-    UnifiedHistoryAPIView
+    UnifiedHistoryAPIView,
+    RegisterAPIView,
+    LogoutAPIView,
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -20,6 +22,8 @@ urlpatterns = [
     path('history/', UnifiedHistoryAPIView.as_view(), name='api_history'),
     
     # Auth
+    path('register/', RegisterAPIView.as_view(), name='api_register'),
+    path('logout/', LogoutAPIView.as_view(), name='api_logout'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

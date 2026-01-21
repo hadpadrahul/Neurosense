@@ -1,54 +1,31 @@
 # Neurosense: Parkinson's Detection System
-Neurosense is a multi-modal assessment system designed to detect early signs of Parkinson's Disease using machine learning. It integrates four distinct diagnostic modules into a unified web application.
+**Version:** 2.1 (Stable) | **Architecture:** Hybrid Monolithic (Web + API)
+
+Neurosense is a comprehensive multi-modal assessment system designed to detect early signs of Parkinson's Disease. It leverages machine learning to analyze user inputs across four distinct diagnostic modalities, accessible via both a traditional Web Interface and a robust REST API.
+
+## Documentation
+- **[API Reference](API_REFERENCE.md)**: Complete guide to REST API endpoints (Auth, Assessment, History).
 
 ---
 
-## Features & Modules
+## Key Features
 
-### 1. Assessment Quiz (Early Screening)
-*   **Method:** 20-question self-report survey.
-*   **Model:** Random Forest (`parkinsons_stage_model.joblib`).
-*   **Input:** User responses (Yes/No).
-*   **Output:** Predicted Stage (Early/Mid/Late) and recommendation.
+### 1. Dual-Mode Accessibility
+*   **Web App:** User-friendly browser interface with real-time feedback and visualizations.
+*   **REST API:** Fully documented endpoints for mobile/external integrations, secured with JWT Authentication.
 
-### 2. Spiral Drawing Analysis (Motor Check)
-*   **Method:** Analysis of hand-drawn spirals for tremors and irregularity.
-*   **Model:** Customized VGG16 CNN (`spiral_model.keras`).
-*   **Input:** Image upload (.png, .jpg).
-*   **Validation:** Checks for circularity, area, and line density to reject invalid drawings.
-*   **Output:** Parkinson's Detected / Healthy.
+### 2. Diagnostic Modules
+| Module | Method | Model | Input |
+| :--- | :--- | :--- | :--- |
+| **Early Screening Quiz** | Self-report survey (20 questions) | Random Forest | JSON / Form Data |
+| **Spiral Analysis** | Handwriting tremor detection | VGG16 CNN | Image (.png/.jpg) |
+| **Voice Analysis** | Acoustic feature extraction (MFCC) | Random Forest | Audio (.wav) |
+| **Brain MRI Scan** | Deep Learning structural analysis | Custom CNN | MRI Scan (.jpg) |
 
-### 3. Voice Impairment Detection
-*   **Method:** Acoustic feature extraction (MFCC, Jitter, Shimmer) from speech recordings.
-*   **Model:** Random Forest (`rf_model.pkl`).
-*   **Input:** Audio file (.wav, .mp3).
-*   **Output:** Parkinson's Detected / Healthy.
-
-### 4. Brain MRI Scan Analysis
-*   **Method:** Deep Learning analysis of MRI scans.
-*   **Model:** CNN (`brain_model.h5`).
-*   **Input:** MRI Image (.jpg, .png).
-*   **Output:** Parkinson's Detected / Healthy.
-
----
-
-## Architecture
-The system follows a **Hybrid Monolithic Architecture**, ensuring robust "Dual Mode" operation where both the Web App and REST API share the same core logic.
-
-- **Web Interface**: Traditional Django templates (MVT) for browser-based access.
-- **REST API**: Stateless API using Django REST Framework (DRF) for mobile/external access.
-- **Unified Service Layer**: All business logic and ML inference are encapsulated in `detection_app/api/services/prediction_service.py`, ensuring 100% logic parity.
-
-### Request Flow
-```mermaid
-graph TD
-    User([User]) --> |Browser| Web[Web Views]
-    User --> |Mobile/Curl| API[API Views]
-    Web --> Service[Service Layer]
-    API --> Service
-    Service --> ML[ML Models]
-    ML --> DB[(Database)]
-```
+### 3. Secure & Robust
+*   **Authentication:** JWT-based stateless auth for API; Session-based for Web.
+*   **Validation:** Strict input validation strategies (Image contrast/ratio, Audio format).
+*   **Safety:** Exception handling ensures server stability even with malformed inputs.
 
 ---
 
@@ -57,42 +34,53 @@ graph TD
 ### Prerequisites
 *   Python 3.10+
 *   pip
-*   Virtual Environment (Recommended)
 
-### 1. Clone & Install Dependencies
+### 1. Setup Environment
 ```bash
-# Install requirements
+# Clone the repository
+git clone <repository-url>
+cd parkinson_detection_system
+
+# Create and activate virtual environment
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# Linux/Mac:
+source .venv/bin/activate
+```
+
+### 2. Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Database Migrations
+### 3. Initialize Database
 ```bash
-python manage.py makemigrations
+# Apply migrations (including token blacklist)
 python manage.py migrate
 ```
 
-### 3. Run the Server
+### 4. Run the Server
 ```bash
 python manage.py runserver
 ```
-Access the application at: `http://127.0.0.1:8000/`
+*   **Web App:** `http://127.0.0.1:8000/`
+*   **API Base:** `http://127.0.0.1:8000/api/v1/`
 
 ---
 
-## 🧪 Testing & Verification
+## Verification & Health Checks
 
-### Run Unit Tests
-To verify all modules (Quiz, Spiral, Voice, Brain) and web routing:
-```bash
-python manage.py test
-```
+We provide a unified system verification suite to ensure all components (Server, Auth, ML Models, File Handling) are functioning correctly.
 
-### Run API Smoke Test
-To perform a client-side verification of running endpoints:
+### Run System Check
 ```bash
-# Ensure server is running first
-python verify_api.py
+python verify_system.py
 ```
+**What this tests:**
+1.  **Server Reachability:** Confirms Django is up.
+2.  **Auth Cycle:** Registers a test user -> Logins -> Refreshes Token -> Logs out -> Confirms Blacklist.
+3.  **Feature Test:** Submits dummy data to Quiz, Spiral, Voice, and Brain endpoints to verify the full inference pipeline.
 
 ---
 
@@ -100,24 +88,33 @@ python verify_api.py
 
 ```
 parkinson_detection_system/
-├── detection_app/          # Main application
-│   ├── models/             # ML Models (.h5, .joblib, .pkl)
-│   ├── templates/          # HTML Templates
-│   ├── tests/              # Unit Tests
-│   ├── views.py            # Application Logic
-│   ├── urls.py             # Routing
-│   ├── spiral_predict.py   # Spiral Inference Logic
-│   ├── feature_extraction.py # Voice Features
+├── detection_app/              # Main Application Core
+│   ├── api/                    # REST API Layer
+│   │   ├── services/           # Business Logic (Unified Service Layer)
+│   │   ├── serializers.py      # Data Serialization
+│   │   └── api_views.py        # API Endpoints
+│   ├── models/                 # ML Models (.h5, .joblib, .pkl)
+│   ├── templates/              # Django HTML Templates (Web UI)
+│   ├── views.py                # Web Logic
 │   └── ...
-├── media/                  # User uploads (spirals, audio, mri)
-├── verify_api.py           # Verification Script
-├── manage.py               # Django Entry Point
-└── requirements.txt        # Dependencies
+├── media/                      # User Uploads (Git-ignored)
+├── parkinson_detection_system/ # Project Settings
+├── verify_system.py            # Master Verification Script
+├── manage.py                   # Django CLI
+├── requirements.txt            # Pinned Dependencies
+└── API_REFERENCE.md            # API Documentation
 ```
 
 ---
 
-## Security & Safety
-*   **Authentication:** All assessment pages require login.
-*   **Input Validation:** Strict validation on all file uploads (Spiral, MRI).
-*   **Fail-Safe:** Models include error handling to prevent server crashes if input is malformed.
+## Architecture
+The system employs a **Service-Oriented Logic** pattern within a Modular Monolith. 
+*   **Web Views** and **API Views** act as interface layers.
+*   Both consume the same **Unified Service Layer** (`detection_app/api/services/prediction_service.py`), ensuring that business logic and ML predictions are identical regardless of the access method.
+
+---
+
+## Security
+*   **Token Blacklisting:** Logout invalidates refresh tokens server-side.
+*   **Input Sanitization:** All file uploads are validated before processing.
+*   **Media Isolation:** User files are stored in a dedicated `media/` directory.
