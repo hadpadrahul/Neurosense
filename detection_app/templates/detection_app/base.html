@@ -221,12 +221,12 @@
         </nav>
         <div class="navbar-auth">
             {% if user.is_authenticated %}
-                <div class="user-info">
+                <a href="{% url 'profile' %}" class="user-info hover:text-purple-700 transition duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 user-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                     </svg>
-                    <span>Hello, {{ user.username }}</span>
-                </div>
+                    <span>{{ user.username }}</span>
+                </a>
                 <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
             {% else %}
                 <a href="{% url 'login' %}" class="login-link">

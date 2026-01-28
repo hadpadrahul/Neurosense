@@ -16,11 +16,13 @@ def _get_model():
     try:
         keras = importlib.import_module('tensorflow.keras')
         load_model = getattr(keras.models, 'load_model')
-        # Updated to use the recovered Keras 3 compatible model
-        model_path = os.path.join(os.path.dirname(__file__), 'spiral_model.keras')
+        
+        # Load the recovered Keras 3 compatible model
+        model_path = os.path.join(os.path.dirname(__file__), 'spiral_model_recovered.h5')
         if os.path.exists(model_path):
-            # compile=False is safer for inference, especially with custom metrics/losses
+            # No custom objects needed anymore!
             _model = load_model(model_path, compile=False)
+            print(f"[INFO] Spiral Model loaded successfully from {model_path}")
         else:
             print(f"[ERROR] Spiral model file not found at {model_path}")
             _model = None
@@ -47,16 +49,28 @@ def predict_spiral(img_path):
         return "Model Not Loaded"
 
     try:
-        keras_preproc = importlib.import_module('tensorflow.keras.preprocessing')
-        image = getattr(keras_preproc, 'image')
-    except Exception:
-        return "Preprocessing library not available"
+        import cv2
+        from tensorflow.keras.applications.vgg16 import preprocess_input
 
-    try:
-        # Load and preprocess the image
-        img = image.load_img(img_path, target_size=(224, 224))
-        img_array = image.img_to_array(img) / 255.0
-        img_array = np.expand_dims(img_array, axis=0)
+        # 1. Read image
+        img = cv2.imread(img_path)
+        if img is None:
+            return f"Error: Could not read image at {img_path}"
+
+        # 2. Resize to (224, 224) - Corrected input shape
+        img = cv2.resize(img, (224, 224))
+
+        # 3. Convert BGR (OpenCV default) to RGB
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        # 4. Cast to float32
+        img = img.astype('float32')
+
+        # 5. Preprocess (VGG16 specific: Subtracts mean RGB, does NOT divide by 255)
+        img = preprocess_input(img)
+
+        # 6. Expand dims to (1, 128, 128, 3)
+        img_array = np.expand_dims(img, axis=0)
 
         # Make prediction
         prediction = model.predict(img_array)
@@ -68,4 +82,5 @@ def predict_spiral(img_path):
             return "Healthy Drawing"
 
     except Exception as e:
+        print(f"[ERROR] Prediction failed: {e}")
         return f"Error: {str(e)}"

@@ -7,6 +7,10 @@ from .api_views import (
     UnifiedHistoryAPIView,
     RegisterAPIView,
     LogoutAPIView,
+    ProfileAPIView,
+    ChangePasswordAPIView,
+    PasswordResetRequestAPIView,
+    PasswordResetConfirmAPIView,
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -23,6 +27,10 @@ urlpatterns = [
     
     # Auth
     path('register/', RegisterAPIView.as_view(), name='api_register'),
+    path('profile/', ProfileAPIView.as_view(), name='api_profile'),
+    path('profile/password/', ChangePasswordAPIView.as_view(), name='api_change_password'),
+    path('password-reset/', PasswordResetRequestAPIView.as_view(), name='api_password_reset_request'),
+    path('password-reset-confirm/', PasswordResetConfirmAPIView.as_view(), name='api_password_reset_confirm'),
     path('logout/', LogoutAPIView.as_view(), name='api_logout'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

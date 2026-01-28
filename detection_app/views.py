@@ -13,13 +13,18 @@ from keras.utils import load_img, img_to_array
 
 from itertools import chain
 from operator import attrgetter
-from .forms import SpeechUploadForm
+from .forms import (
+    SpeechUploadForm, 
+    CustomAuthenticationForm, 
+    CustomUserCreationForm,
+    CustomPasswordChangeForm
+)
 from .models import SpeechAssessmentResult
 from .feature_extraction import extract_features
 
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -32,13 +37,12 @@ from django.utils import timezone
 from .models import AssessmentResult, PatientProfile, AssessmentHistory, SpiralAssessmentResult, SpeechAssessmentResult, BrainScanResult
 # Import your custom prediction/validation functions
 from .spiral_predict import predict_spiral
-from .spiral_predict import predict_spiral
 from .spiral_validator import is_valid_spiral
 from .mri_validator import is_valid_mri
 
 # Load Brain Model (Global)
 # Adjust path as necessary. Assuming model is in detection_app or root.
-BRAIN_MODEL_PATH = os.path.join(settings.BASE_DIR, 'detection_app', 'models', 'brain_model.h5') 
+BRAIN_MODEL_PATH = os.path.join(settings.BASE_DIR, 'detection_app', 'models', 'brain_model_recovered.h5') 
 # Or wherever it is. The user didn't specify, but let's assume detection_app/brain.h5 or check list.
 try:
     brain_model = load_model(BRAIN_MODEL_PATH)
@@ -88,36 +92,7 @@ except Exception as e:
 from .quiz_data import questions, option_choices
 
 
-# ---------------------------- Forms ----------------------------------
 
-class CustomAuthenticationForm(AuthenticationForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={
-        'placeholder': 'Enter your username or email',
-        'class': 'input-field'
-    }))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Enter your password',
-        'class': 'input-field'
-    }))
-
-class CustomUserCreationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = UserCreationForm.Meta.model
-        fields = ('username',) + UserCreationForm.Meta.fields[1:]
-        widgets = {
-            'username': forms.TextInput(attrs={
-                'placeholder': 'Enter your username',
-                'class': 'input-field'
-            }),
-            'password1': forms.PasswordInput(attrs={
-                'placeholder': 'Enter your password',
-                'class': 'input-field'
-            }),
-            'password2': forms.PasswordInput(attrs={
-                'placeholder': 'Confirm your password',
-                'class': 'input-field'
-            }),
-        }
 
 # ---------------------------- Core Website Views ----------------------------------
 
@@ -358,7 +333,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Account created successfully! Welcome to ParkPredict.')
+            messages.success(request, 'Account created successfully! Welcome to NeuroSense.')
             return redirect('home')
         else:
             for field, errors in form.errors.items():
@@ -399,6 +374,22 @@ def logout_view(request):
     messages.info(request, 'You have been logged out.')
     return redirect('home')
 
+@login_required
+def profile_view(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = CustomPasswordChangeForm(request.user)
+    return render(request, 'detection_app/profile.html', {
+        'form': form
+    })
 
 def demo_video_view(request):
     return render(request, 'detection_app/demo_video.html')
@@ -594,16 +585,24 @@ def voice_upload(request):
                     f.write(chunk)
 
             try:
-                # Load models (using BASE_DIR as per original)
-                model_path = os.path.join(settings.BASE_DIR, 'rf_model.pkl')
-                scaler_path = os.path.join(settings.BASE_DIR, 'scaler.pkl')
-                
-                model = joblib.load(model_path)
-                scaler = joblib.load(scaler_path)
+                # Load new model (rf_model_parkinson.pkl)
+                model_path = os.path.join(settings.BASE_DIR, 'rf_model_parkinson.pkl')
+                # Scaler is skipped because existing scaler.pkl is for 40 features, and new model is 22.
+                # Random Forest is generally robust to unscaled data.
 
+                if not os.path.exists(model_path):
+                     raise FileNotFoundError("Voice model file missing.")
+
+                try:
+                    model = joblib.load(model_path)
+                except Exception as e:
+                     raise ValueError(f"Model loading failed: {e}")
+                
                 features = extract_features(upload_path)
-                scaled_features = scaler.transform([features])
-                prediction = model.predict(scaled_features)[0]
+                # features shape is (22,) -> reshape to (1, 22)
+                features_reshape = features.reshape(1, -1)
+                
+                prediction = model.predict(features_reshape)[0]
 
                 result_label = "Parkinson's Detected" if prediction == 1 else "Healthy Voice"
 
@@ -618,7 +617,7 @@ def voice_upload(request):
                 return redirect(reverse('voice_result', kwargs={'prediction': result_label}))
 
             except Exception as e:
-                messages.error(request, f"Prediction error: {e}")
+                messages.error(request, f"Analysis Error: {e}")
                 return redirect('voice_upload')
     else:
         form = SpeechUploadForm()

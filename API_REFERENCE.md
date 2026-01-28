@@ -39,13 +39,14 @@ These routes render HTML pages for browser usage.
     ```json
     {
         "username": "newuser",
-        "password": "password123"
+        "password": "password123",
+        "email": "user@example.com"
     }
     ```
 *   **Response (201 Created):**
     ```json
     {
-        "user": {"id": 1, "username": "newuser", "email": ""},
+        "user": {"id": 1, "username": "newuser", "email": "user@example.com"},
         "message": "User created successfully..."
     }
     ```
@@ -74,7 +75,48 @@ These routes render HTML pages for browser usage.
 *   **Body:** `{"refresh": "ey..."}`
 *   **Response:** `{"access": "ey_new..."}`
 
-#### 4. Logout
+#### 4. User Profile
+*   **URL:** `/api/v1/profile/`
+*   **Method:** `GET`
+*   **Headers:** `Authorization: Bearer <token>`
+*   **Response:**
+    ```json
+    {"username": "testuser", "email": "test@example.com"}
+    ```
+
+#### 5. Change Password
+*   **URL:** `/api/v1/profile/password/`
+*   **Method:** `PUT` / `PATCH`
+*   **Headers:** `Authorization: Bearer <token>`
+*   **Body:**
+    ```json
+    {
+        "old_password": "current_pass",
+        "new_password": "new_pass",
+        "confirm_password": "new_pass"
+    }
+    ```
+
+#### 6. Forgot Password (Request)
+*   **URL:** `/api/v1/password-reset/`
+*   **Method:** `POST`
+*   **Body:** `{"email": "user@example.com"}`
+*   **Response:** `{"message": "Password reset email sent...", "uid": "...", "token": "..."}`
+    *(Note: In production, uid/token are sent via email only)*
+
+#### 7. Forgot Password (Confirm)
+*   **URL:** `/api/v1/password-reset-confirm/`
+*   **Method:** `POST`
+*   **Body:**
+    ```json
+    {
+        "uid": "...",
+        "token": "...",
+        "new_password": "new_secure_pass"
+    }
+    ```
+
+#### 8. Logout
 *   **URL:** `/api/v1/logout/`
 *   **Method:** `POST`
 *   **Headers:** `Authorization: Bearer <token>`

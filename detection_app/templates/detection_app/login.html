@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - ParkPredict</title>
+  <title>Login - NeuroSense</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -82,7 +82,7 @@
 
   <div class="auth-card">
     <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome Back!</h2>
-    <p class="text-gray-600 mb-6">Log in to your ParkPredict account</p>
+    <p class="text-gray-600 mb-6">Log in to your account</p>
 
     <!-- Show Django messages -->
     {% if messages %}
@@ -95,8 +95,20 @@
 
     <form action="/login/" method="POST">
       {% csrf_token %}
-      <input type="text" name="username" class="input-field" placeholder="Username" required />
-      <input type="password" name="password" class="input-field" placeholder="Password" required />
+      {% for field in form %}
+        <div class="mb-4 text-left">
+          <label class="block text-gray-700 font-medium mb-1">{{ field.label }}</label>
+          {{ field }}
+          {% if field.name == 'password' %}
+             <div class="text-right mt-1">
+                <a href="{% url 'password_reset' %}" class="text-sm text-blue-600 hover:underline">Forgot Password?</a>
+             </div>
+          {% endif %}
+          {% if field.errors %}
+            <p class="text-red-500 text-sm mt-1">{{ field.errors.0 }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
       <button type="submit" class="btn-primary">Log In</button>
     </form>
 

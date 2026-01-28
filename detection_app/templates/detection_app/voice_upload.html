@@ -170,6 +170,23 @@
 <div class="container">
   <div class="card">
     <h2>Upload Voice Sample</h2>
+    
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+      {% for message in messages %}
+      <div style="
+        padding: 10px;
+        background: rgba(255, 0, 0, 0.2); 
+        border: 1px solid #ff4444; 
+        border-radius: 8px; 
+        color: #ffcccc; 
+        font-size: 14px;">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <form method="POST" enctype="multipart/form-data">
   {% csrf_token %}
   <div class="file-input">

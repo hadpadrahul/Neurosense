@@ -97,13 +97,24 @@ def run_full_suite():
     log_section("2. Authentication Flow")
     
     # A. Register
-    reg_data = {"username": TEST_USER, "password": TEST_PASS}
-    resp = session.post(f"{API_URL}/register/", json=reg_data)
+    reg_data = {"username": TEST_USER, "password": TEST_PASS, "email": f"{TEST_USER}@example.com"}
+    resp = requests.post(f"{API_URL}/register/", json=reg_data)
     if resp.status_code == 201:
         log_ok(f"Registered User: {TEST_USER}")
     else:
         log_fail("Registration Failed", resp.text)
         return # Critical
+
+    # A.1. Register Duplicate Email (Negative Test)
+    resp = requests.post(f"{API_URL}/register/", json={
+        "username": f"{TEST_USER}_2", 
+        "password": TEST_PASS,
+        "email": f"{TEST_USER}@example.com"
+    })
+    if resp.status_code == 400:
+       log_ok("Duplicate Email Rejected")
+    else:
+       log_fail("Duplicate Email Accepted?", resp.status_code)
 
     # B. Login (Get Tokens)
     login_data = {"username": TEST_USER, "password": TEST_PASS}
@@ -134,6 +145,21 @@ def run_full_suite():
     else:
         log_fail("Token Refresh Failed", resp.text)
 
+
+    # 2.D Profile & Password Change
+    resp = requests.get(f"{API_URL}/profile/", headers=headers)
+    if resp.status_code == 200:
+        log_ok("Profile Retrieved")
+    else:
+        log_fail("Profile Retrieve Failed", resp.status_code)
+        
+    # 2.E Password Reset (Flow)
+    # We will just trigger the email for basic systems check
+    resp = requests.post(f"{API_URL}/password-reset/", json={"email": f"{TEST_USER}@example.com"})
+    if resp.status_code == 200:
+        log_ok("Password Reset Email Triggered")
+    else:
+        log_fail("Password Reset Trigger Failed", resp.status_code)
 
     # 3. Assessment Endpoints
     log_section("3. Feature Verification")

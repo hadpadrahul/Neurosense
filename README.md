@@ -24,6 +24,7 @@ Neurosense is a comprehensive multi-modal assessment system designed to detect e
 
 ### 3. Secure & Robust
 *   **Authentication:** JWT-based stateless auth for API; Session-based for Web.
+*   **User Management:** Email registration, Profile management, and Forgot Password flow.
 *   **Validation:** Strict input validation strategies (Image contrast/ratio, Audio format).
 *   **Safety:** Exception handling ensures server stability even with malformed inputs.
 
@@ -82,6 +83,12 @@ python verify_system.py
 2.  **Auth Cycle:** Registers a test user -> Logins -> Refreshes Token -> Logs out -> Confirms Blacklist.
 3.  **Feature Test:** Submits dummy data to Quiz, Spiral, Voice, and Brain endpoints to verify the full inference pipeline.
 
+### Run Frontend Tests
+To verify the Website integration (Views, Protected Pages, Auth Redirects):
+```bash
+python manage.py test tests.test_website
+```
+
 ---
 
 ## Project Structure
@@ -93,13 +100,16 @@ parkinson_detection_system/
 │   │   ├── services/           # Business Logic (Unified Service Layer)
 │   │   ├── serializers.py      # Data Serialization
 │   │   └── api_views.py        # API Endpoints
-│   ├── models/                 # ML Models (.h5, .joblib, .pkl)
+│   ├── models/                 # Database Models
 │   ├── templates/              # Django HTML Templates (Web UI)
 │   ├── views.py                # Web Logic
 │   └── ...
+├── tests/                      # Consolidated Website Tests
 ├── media/                      # User Uploads (Git-ignored)
 ├── parkinson_detection_system/ # Project Settings
 ├── verify_system.py            # Master Verification Script
+├── recover_spiral_model.py     # Spiral Model Recovery Utility
+├── recover_brain_model.py      # Brain Model Recovery Utility
 ├── manage.py                   # Django CLI
 ├── requirements.txt            # Pinned Dependencies
 └── API_REFERENCE.md            # API Documentation

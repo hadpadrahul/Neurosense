@@ -227,12 +227,14 @@
         </nav>
         <div class="navbar-auth">
             {% if user.is_authenticated %}
-                <div class="user-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 user-icon" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                    </svg>
-                    <span>Hello, {{ user.username }}</span>
-                </div>
+                <a href="{% url 'profile' %}" class="user-info hover:text-purple-700 transition duration-300 group">
+                    <div class="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <span class="text-gray-700 group-hover:text-purple-700">{{ user.username }}</span>
+                </a>
                 <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
             {% else %}
                 <a href="{% url 'login' %}" class="login-link">
@@ -435,7 +437,7 @@
                 <a href="{% url 'quiz' %}" class="btn-quiz inline-block">Take Quiz</a>
 
                 {# "Watch Demo" button - now an <a> tag linking to demo_video #}
-                <a href="{% url 'demo_video' %}" class="btn-secondary inline-block">Watch Demo</a>
+                <!-- <a href="{% url 'demo_video' %}" class="btn-secondary inline-block">Watch Demo</a> -->
             </div>
         </div>
     </section>
@@ -445,7 +447,7 @@
         <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
             <!-- Brand Info -->
             <div>
-                <h3 class="text-white text-xl font-bold mb-4">ParkPredict</h3>
+                <h3 class="text-white text-xl font-bold mb-4">NeuroSense</h3>
                 <p class="text-sm">
                     Empowering early Parkinson's disease detection through innovative assessment methods.
                 </p>
@@ -480,7 +482,7 @@
             </div>
         </div>
         <div class="text-center text-gray-500 text-sm mt-12">
-            &copy; 2024 ParkPredict. All rights reserved. Not a substitute for professional medical advice.
+            &copy; 2025 NeuroSense. All rights reserved. Not a substitute for professional medical advice.
         </div>
     </footer>
 
