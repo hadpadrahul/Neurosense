@@ -195,21 +195,27 @@ def predict_voice_wrapper(audio_path):
     # Reimplementing logic from voice_upload view as it's inline there
     try:
         from detection_app.feature_extraction import extract_features
-        rf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'rf_model.pkl')
-        scaler_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'scaler.pkl')
+        # FIX: Use new model rf_model_parkinson.pkl
+        rf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'rf_model_parkinson.pkl')
+        # Scaler is skipped as per manual fix
         
+        if not os.path.exists(rf_path):
+             return "Voice model missing"
+
         # Load from file if not loaded (or rely on cached loads)
         model = joblib.load(rf_path)
-        scaler = joblib.load(scaler_path)
+        # scaler = joblib.load(scaler_path) # REMOVED
 
         features = extract_features(audio_path)
-        scaled_features = scaler.transform([features])
-        prediction = model.predict(scaled_features)[0]
+        # Scaler skipped, reshape for single sample
+        features_reshape = features.reshape(1, -1)
+        
+        prediction = model.predict(features_reshape)[0]
 
         return "Parkinson's Detected" if prediction == 1 else "Healthy Voice"
     except Exception as e:
         print(f"Voice prediction error: {e}")
-        return "Error in voice analysis"
+        return f"Error in voice analysis: {e}"
 
 def predict_brain_wrapper(image_path):
     # Reimplementing logic from brain_upload_view
@@ -219,12 +225,13 @@ def predict_brain_wrapper(image_path):
         from tensorflow.keras.preprocessing.image import load_img, img_to_array
         
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        model_path = os.path.join(base_dir, 'detection_app', 'models', 'brain_model.h5')
+        # FIX: Use brain_model_recovered.h5
+        model_path = os.path.join(base_dir, 'detection_app', 'models', 'brain_model_recovered.h5')
         
         if not os.path.exists(model_path):
             return "Model not found"
             
-        brain_model = load_model(model_path)
+        brain_model = load_model(model_path, compile=False)
         
         img = load_img(image_path, target_size=(224, 224))
         img_array = img_to_array(img) / 255.0
@@ -235,7 +242,7 @@ def predict_brain_wrapper(image_path):
         
     except Exception as e:
         print(f"Brain prediction error: {e}")
-        return "Error in brain analysis"
+        return f"Error in brain analysis: {e}"
 
 def is_valid_mri_wrapper(image_path):
     try:
