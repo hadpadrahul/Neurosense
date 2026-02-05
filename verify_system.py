@@ -200,7 +200,11 @@ def run_full_suite():
         files = {'image': ('test_brain.jpg', dummy_img, 'image/jpeg')} # Reuse dummy img for brain
         resp = requests.post(f"{API_URL}/assessments/brain/", files=files, headers=headers)
         if resp.status_code == 201:
-           log_ok("Brain MRI Upload Verified")
+           res_json = resp.json()
+           if res_json.get('result') in ["Parkinson Detected", "Normal"]:
+               log_ok(f"Brain MRI Upload Verified (Result: {res_json.get('result')})")
+           else:
+               log_fail(f"Brain MRI Upload Invalid Result: {res_json}")
         elif resp.status_code == 400:
            log_ok("Brain MRI Upload Hit Validator (Expected for dummy image)")
         else:
@@ -210,7 +214,12 @@ def run_full_suite():
         files = {'audio': ('test_voice.wav', dummy_audio, 'audio/wav')}
         resp = requests.post(f"{API_URL}/assessments/voice/", files=files, headers=headers)
         if resp.status_code == 201:
-           log_ok("Voice Upload Verified")
+           res_json = resp.json()
+           result_val = res_json.get('result')
+           if result_val in ["Parkinson's Detected", "Healthy Voice"]:
+               log_ok(f"Voice Upload Verified (Result: {result_val})")
+           else:
+               log_fail(f"Voice Upload Invalid Result: {res_json}")
         else:
            # Voice model might accept dummy WAV or fail gracefully
            if resp.status_code == 400:

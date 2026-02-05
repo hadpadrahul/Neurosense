@@ -150,6 +150,7 @@ These routes render HTML pages for browser usage.
 #### 2. Spiral Analysis
 *   **URL:** `/api/v1/assessments/spiral/`
 *   **Method:** `POST`
+*   **Headers:** `Authorization: Bearer <token>`
 *   **Content-Type:** `multipart/form-data`
 *   **Body:**
     *   `image`: (File Binary .png/.jpg)
@@ -164,6 +165,7 @@ These routes render HTML pages for browser usage.
 #### 3. Voice Analysis
 *   **URL:** `/api/v1/assessments/voice/`
 *   **Method:** `POST`
+*   **Headers:** `Authorization: Bearer <token>`
 *   **Content-Type:** `multipart/form-data`
 *   **Body:**
     *   `audio`: (File Binary .wav)
@@ -178,6 +180,7 @@ These routes render HTML pages for browser usage.
 #### 4. Brain MRI Analysis
 *   **URL:** `/api/v1/assessments/brain/`
 *   **Method:** `POST`
+*   **Headers:** `Authorization: Bearer <token>`
 *   **Content-Type:** `multipart/form-data`
 *   **Body:**
     *   `image`: (File Binary .jpg)
@@ -195,6 +198,7 @@ These routes render HTML pages for browser usage.
 #### Get User History
 *   **URL:** `/api/v1/history/`
 *   **Method:** `GET`
+*   **Headers:** `Authorization: Bearer <token>`
 *   **Response:**
     ```json
     [

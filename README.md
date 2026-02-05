@@ -87,7 +87,15 @@ python verify_system.py
 To verify the Website integration (Views, Protected Pages, Auth Redirects):
 ```bash
 python manage.py test tests.test_website
+python manage.py test tests.test_website
 ```
+
+### Run Interactive API Check
+To manually verify API endpoints with real files (skipping Postman setup):
+```bash
+python interactive_api_test.py
+```
+*   Helper utility to login, retrieve tokens, and upload your local files to verify Spiral, Voice, and Brain models interactively.
 
 ---
 
@@ -108,6 +116,7 @@ parkinson_detection_system/
 ├── media/                      # User Uploads (Git-ignored)
 ├── parkinson_detection_system/ # Project Settings
 ├── verify_system.py            # Master Verification Script
+├── interactive_api_test.py     # Interactive Manual Testing Tool
 ├── recover_spiral_model.py     # Spiral Model Recovery Utility
 ├── recover_brain_model.py      # Brain Model Recovery Utility
 ├── manage.py                   # Django CLI

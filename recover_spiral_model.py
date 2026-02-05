@@ -45,7 +45,7 @@ def recover_model():
     try:
         # Load weights: allow partial match
         model.load_weights(MODEL_PATH, by_name=True, skip_mismatch=True)
-        print("✅ Weights loaded successfully (partial/full match).")
+        print("[INFO] Weights loaded successfully (partial/full match).")
     except Exception as e:
         print(f"FAILED to load weights: {e}")
         return
@@ -54,14 +54,14 @@ def recover_model():
     try:
         dummy_input = np.zeros((1, 224, 224, 3))
         pred = model.predict(dummy_input)
-        print(f"✅ Prediction successful: {pred}")
+        print(f"[INFO] Prediction successful: {pred}")
     except Exception as e:
-        print(f"❌ Inference failed: {e}")
+        print(f"[ERROR] Inference failed: {e}")
         return
 
     print(f"\n[6] Saving to {SAVE_PATH}...")
     model.save(SAVE_PATH)
-    print("✅ Model saved successfully!")
+    print("[INFO] Model saved successfully!")
 
 if __name__ == "__main__":
     recover_model()

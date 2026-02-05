@@ -195,8 +195,16 @@ def predict_voice_wrapper(audio_path):
     # Reimplementing logic from voice_upload view as it's inline there
     try:
         from detection_app.feature_extraction import extract_features
-        # FIX: Use new model rf_model_parkinson.pkl
-        rf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'rf_model_parkinson.pkl')
+        # base_dir should be project root (parkinson_detection_system_final)
+        # file is in detection_app/api/services/prediction_service.py
+        # 1. services
+        # 2. api
+        # 3. detection_app
+        # 4. root
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        
+        # FIX: Use new model rf_model_parkinson.pkl (in root)
+        rf_path = os.path.join(base_dir, 'rf_model_parkinson.pkl')
         # Scaler is skipped as per manual fix
         
         if not os.path.exists(rf_path):
@@ -224,7 +232,9 @@ def predict_brain_wrapper(image_path):
         from tensorflow.keras.models import load_model
         from tensorflow.keras.preprocessing.image import load_img, img_to_array
         
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        # base_dir should be project root
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        
         # FIX: Use brain_model_recovered.h5
         model_path = os.path.join(base_dir, 'detection_app', 'models', 'brain_model_recovered.h5')
         
@@ -237,7 +247,7 @@ def predict_brain_wrapper(image_path):
         img_array = img_to_array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
-        prediction = brain_model.predict(img_array)[0][0]
+        prediction = brain_model.predict(img_array, verbose=0)[0][0]
         return "Parkinson Detected" if prediction > 0.5 else "Normal"
         
     except Exception as e:

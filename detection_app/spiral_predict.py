@@ -73,7 +73,7 @@ def predict_spiral(img_path):
         img_array = np.expand_dims(img, axis=0)
 
         # Make prediction
-        prediction = model.predict(img_array)
+        prediction = model.predict(img_array, verbose=0)
 
         # Interpret result
         if prediction[0][0] > 0.5:
