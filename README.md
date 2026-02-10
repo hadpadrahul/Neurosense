@@ -34,7 +34,11 @@ Neurosense is a comprehensive multi-modal assessment system designed to detect e
 
 ### Prerequisites
 *   Python 3.10+
+*   Python 3.10+
 *   pip
+*   **FFmpeg** (Recommended for robust audio processing):
+    *   Download from [ffmpeg.org](https://ffmpeg.org/download.html)
+    *   Add `bin` folder to System PATH.
 
 ### 1. Setup Environment
 ```bash
