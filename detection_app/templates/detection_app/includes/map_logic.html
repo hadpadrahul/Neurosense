@@ -1,0 +1,171 @@
+<!-- CSS for Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<!-- JS for Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<style>
+    #specialist-map {
+        height: 400px;
+        width: 100%;
+        border-radius: 12px;
+        margin-top: 20px;
+        z-index: 1; /* Ensure it stays below headers */
+    }
+    .map-section {
+        display: none; /* Hidden by default */
+        margin-top: 30px;
+        padding: 20px;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .map-header {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+</style>
+
+<div id="map-container" class="map-section">
+    <h3 class="map-header">Nearby Neurologists & Specialists</h3>
+    <p class="text-center text-muted">Finding specialists within 30km of your location...</p>
+    
+    <div style="position: relative;">
+        <!-- Recenter Button Overlay -->
+        <button id="recenter-btn" class="btn btn-sm btn-light" style="
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            z-index: 1000; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;">
+            📍 Recenter
+        </button>
+        <div id="specialist-map"></div>
+    </div>
+
+    <!-- Global Google Maps Button -->
+    <div class="text-center mt-3">
+        <a id="gmaps-global-link" href="#" target="_blank" class="btn btn-outline-primary" style="display: none;">
+            View All Results on Google Maps ↗
+        </a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Determine if we should show the map.
+    // Logic: If result contains "Parkinson" or "Stage" (Quiz), show map.
+    // If "Healthy", "Normal", "No Parkinson", hide it.
+    
+    // Get result text from the page context (rendered by Django)
+    // We assume the variable 'result_text' is set globally or we grab it from DOM.
+    // For specific templates, we might look for specific IDs.
+    
+    let resultText = "{{ result|default:'' }} {{ predicted_stage|default:'' }} {{ prediction_result|default:'' }}".trim();
+    
+    // Normalized check
+    const isHealthy = resultText.match(/Healthy|Normal|No Parkinson|No PD|Fantastic News/i);
+    
+    if (!resultText || isHealthy) {
+        console.log("Result is healthy or empty. Map hidden.");
+        return; 
+    }
+
+    // 2. Show the container
+    const mapSection = document.getElementById('map-container');
+    mapSection.style.display = 'block';
+
+    // 3. Initialize Map (Default view: World)
+    const map = L.map('specialist-map').setView([0, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // 4. Get User Location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success, error);
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+
+    function success(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        // Setup Map Center
+        map.setView([lat, lon], 15); // Closer zoom (15) for ~3-5km view
+
+        // Show Buttons
+        const recenterBtn = document.getElementById('recenter-btn');
+        const gmapsLink = document.getElementById('gmaps-global-link');
+        
+        if(recenterBtn) {
+            recenterBtn.style.display = 'block';
+            recenterBtn.onclick = function() {
+                map.flyTo([lat, lon], 15);
+            };
+        }
+
+        if(gmapsLink) {
+            // Search for "neurologist" near the user's location
+            gmapsLink.href = `https://www.google.com/maps/search/neurologist+movement+disorder+specialist/@${lat},${lon},13z`;
+            gmapsLink.style.display = 'inline-block';
+        }
+        
+        // Add user marker
+        L.marker([lat, lon]).addTo(map)
+            .bindPopup("<b>You are here</b>")
+            .openPopup();
+
+        // 5. Fetch Specialists via Internal View (No External API Dependency)
+        fetch('{% url "internal_nearby_specialists" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}' // Django CSRF
+            },
+            body: JSON.stringify({ lat: lat, lon: lon })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error("API Error:", data.error);
+                return;
+            }
+            
+            // 6. Add Markers
+            if (data.length > 0) {
+                 const markers = L.featureGroup();
+                 markers.addLayer(L.marker([lat, lon])); // Add user
+
+                data.forEach(place => {
+                    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`;
+                    
+                    const popupContent = `
+                        <div style="min-width: 150px;">
+                            <strong>${place.name}</strong><br>
+                            <span class="badge bg-info text-dark">${place.type}</span><br>
+                            <small>${place.distance_km} km away</small><br>
+                            ${place.address ? `<small class="text-muted">${place.address}</small><br>` : ''}
+                            <a href="${googleMapsUrl}" target="_blank" class="btn btn-sm btn-primary mt-2">Get Directions</a>
+                        </div>
+                    `;
+                    
+                    const marker = L.marker([place.lat, place.lon]).addTo(map).bindPopup(popupContent);
+                    markers.addLayer(marker);
+                });
+
+                // Auto-fit bounds to show all markers (User + Specialists)
+                map.fitBounds(markers.getBounds(), {padding: [50, 50]});
+            }
+        })
+        .catch(err => console.error("Fetch error:", err));
+    }
+
+    function error() {
+        alert("Unable to retrieve your location. Cannot show nearby specialists.");
+    }
+});
+</script>

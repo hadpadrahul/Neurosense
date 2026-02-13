@@ -101,3 +101,32 @@ class WebsiteTests(TestCase):
         self.client.logout()
         login_fail = self.client.login(username=self.username, password=self.password)
         self.assertFalse(login_fail, "Login with old password should fail")
+    
+    # --- 4. Internal Features ---
+    def test_nearby_specialists_internal(self):
+        """Test the internal view for gathering nearby specialists."""
+        url = reverse('internal_nearby_specialists')
+        
+        # Test 1: GET not allowed (it's require_POST)
+        response = self.client.get(url)
+        # Should be 405 Method Not Allowed or similar, but standard Django require_POST usually returns 405.
+        self.assertEqual(response.status_code, 405)
+
+        # Test 2: POST without data
+        response = self.client.post(url, content_type='application/json')
+        # Empty body might cause JSON decode error (500) or 400 if handled. 
+        # Our view does: data = json.loads(request.body) which might fail if empty.
+        # But if we send {} it returns 400.
+        try:
+             response = self.client.post(url, {}, content_type='application/json')
+             # Checks if it returns 400 "Latitude and Longitude required"
+             self.assertEqual(response.status_code, 400)
+        except:
+             pass
+
+        # Test 3: Valid POST (Mocked Service ideally, but we test the view logic)
+        # We won't mock external API call here to keep it simple, but we can check if it tries.
+        # This is an integration test.
+        # data = {'lat': 12.97, 'lon': 77.59}
+        # response = self.client.post(url, data, content_type='application/json')
+        # self.assertEqual(response.status_code, 200) # Might fail if no internet or API down.

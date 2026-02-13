@@ -17,6 +17,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),  # Logout
     path('profile/', views.profile_view, name='profile'), # User Profile
 
+    path('internal-nearby-specialists/', views.get_nearby_specialists, name='internal_nearby_specialists'),
+    
     # Password Reset URLs
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='registration/password_reset_form.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name='password_reset_done'),
@@ -43,13 +45,10 @@ urlpatterns = [
     path('speech-upload/', views.voice_upload, name='voice_upload'),
     path('result/<str:prediction>/', views.voice_result, name='voice_result'),
     path('brain-detection/', views.brain_view, name='brain_view'),
-
-
-
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Serve media files during development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

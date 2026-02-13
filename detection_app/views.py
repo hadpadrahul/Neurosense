@@ -634,5 +634,41 @@ def voice_result(request, prediction):
 
 
 
+# -------------------------- Internal AJAX Views ----------------------------
+
+from django.views.decorators.http import require_POST
+import json
+from django.views.decorators.csrf import csrf_exempt
+import datetime
+
+def log_debug(message):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{timestamp}] [WEB] {message}")
+
+# Internal view for website map (avoids using external API)
+@require_POST
+def get_nearby_specialists(request):
+    try:
+        data = json.loads(request.body)
+        lat = data.get('lat')
+        lon = data.get('lon')
+        
+        log_debug(f"Fetching nearby specialists for Lat: {lat}, Lon: {lon}")
+        
+        if not lat or not lon:
+             log_debug("Error: Latitude or Longitude missing")
+             return JsonResponse({"error": "Latitude and Longitude required"}, status=400)
+
+        from .services.location_service import find_nearby_specialists
+        specialists = find_nearby_specialists(lat, lon)
+        log_debug(f"Found {len(specialists)} specialists.")
+        return JsonResponse(specialists, safe=False)
+    except Exception as e:
+        log_debug(f"Exception in get_nearby_specialists: {e}")
+        return JsonResponse({"error": str(e)}, status=500)
+
 # ----------------- End of Views -----------------
 
+
+def privacy_policy(request):
+    return render(request, 'detection_app/privacy.html')

@@ -262,3 +262,84 @@ def is_valid_mri_wrapper(image_path):
         return False
     except Exception:
         return False
+
+def calculate_risk_score(user):
+    from detection_app.models import AssessmentResult, SpiralAssessmentResult, SpeechAssessmentResult, BrainScanResult
+
+    # Normalization Logic
+    # 1. Quiz (0-100)
+    quiz_score = 0
+    quiz_count = 0
+    latest_quiz = AssessmentResult.objects.filter(user=user).order_by('-created_at').last() # Default ordering is correct, but let's be safe with .last() or order_by desc .first()
+    # Actually models have ordering = ['created_at'], so .last() gives the most recent.
+    # To be explicit: order_by('-created_at').first()
+    latest_quiz = AssessmentResult.objects.filter(user=user).order_by('-created_at').first()
+    
+    if latest_quiz:
+        quiz_count = 1
+        stage_str = latest_quiz.predicted_stage.lower()
+        if "no" in stage_str or "normal" in stage_str or "healthy" in stage_str:
+            quiz_score = 0
+        elif "stage 1" in stage_str:
+            quiz_score = 20
+        elif "stage 2" in stage_str:
+            quiz_score = 40
+        elif "stage 3" in stage_str:
+            quiz_score = 60
+        elif "stage 4" in stage_str:
+            quiz_score = 80
+        elif "stage 5" in stage_str:
+            quiz_score = 100
+        # If unknown string, defaults to 0 (conservative)
+    
+    # 2. Spiral (0 or 100)
+    spiral_score = 0
+    spiral_count = 0
+    latest_spiral = SpiralAssessmentResult.objects.filter(user=user).order_by('-created_at').first()
+    if latest_spiral:
+        spiral_count = 1
+        if "parkinson" in latest_spiral.result.lower():
+            spiral_score = 100
+        # else 0
+
+    # 3. Voice (0 or 100)
+    voice_score = 0
+    voice_count = 0
+    latest_voice = SpeechAssessmentResult.objects.filter(user=user).order_by('-created_at').first()
+    if latest_voice:
+        voice_count = 1
+        if "parkinson" in latest_voice.result.lower():
+            voice_score = 100
+        # else 0
+            
+    # 4. Brain (0 or 100)
+    brain_score = 0
+    brain_count = 0
+    latest_brain = BrainScanResult.objects.filter(user=user).order_by('-created_at').first()
+    if latest_brain:
+        brain_count = 1
+        if "parkinson" in latest_brain.result.lower():
+            brain_score = 100
+        # else 0
+
+    total_components = quiz_count + spiral_count + voice_count + brain_count
+    
+    if total_components == 0:
+        return {
+            "risk_percentage": 0,
+            "message": "No assessments found.",
+            "components": {}
+        }
+        
+    avg_score = (quiz_score + spiral_score + voice_score + brain_score) / total_components
+    
+    return {
+        "risk_percentage": round(avg_score, 2),
+        "message": "Risk score based on latest assessments.",
+        "components": {
+            "quiz": {"score": quiz_score, "available": bool(quiz_count)},
+            "spiral": {"score": spiral_score, "available": bool(spiral_count)},
+            "voice": {"score": voice_score, "available": bool(voice_count)},
+            "brain": {"score": brain_score, "available": bool(brain_count)}
+        }
+    }

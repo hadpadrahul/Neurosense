@@ -27,6 +27,7 @@ Neurosense is a comprehensive multi-modal assessment system designed to detect e
 *   **User Management:** Email registration, Profile management, and Forgot Password flow.
 *   **Validation:** Strict input validation strategies (Image contrast/ratio, Audio format).
 *   **Safety:** Exception handling ensures server stability even with malformed inputs.
+*   **Geolocation Map:** Integrated Leaflet.js map to find nearby specialists (Neurologists/Hospitals) within a 15km radius, with a default 3-5km visual zoom for immediate relevance.
 
 ---
 
@@ -34,7 +35,7 @@ Neurosense is a comprehensive multi-modal assessment system designed to detect e
 
 ### Prerequisites
 *   Python 3.10+
-*   Python 3.10+
+*   Python 3.12 (recommended)
 *   pip
 *   **FFmpeg** (Recommended for robust audio processing):
     *   Download from [ffmpeg.org](https://ffmpeg.org/download.html)
@@ -80,7 +81,7 @@ We provide a unified system verification suite to ensure all components (Server,
 
 ### Run System Check
 ```bash
-python verify_system.py
+python verify_system_script.py
 ```
 **What this tests:**
 1.  **Server Reachability:** Confirms Django is up.
@@ -91,14 +92,27 @@ python verify_system.py
 To verify the Website integration (Views, Protected Pages, Auth Redirects):
 ```bash
 python manage.py test tests.test_website
-python manage.py test tests.test_website
 ```
 
-### Run Interactive API Check
-To manually verify API endpoints with real files (skipping Postman setup):
+## Verification
+To verify the entire system (including new Privacy Policy and Risk Score API), run:
+```bash
+python verify_system_script.py
+```
+This script acts as a comprehensive integration test.
+
+## Interactive Testing
+For manual testing of APIs:
 ```bash
 python interactive_api_test.py
 ```
+Menu options include:
+- Register/Login
+- Test Quiz, Spiral, Voice, Brain APIs
+- View History & Profile
+- **Test Nearby Specialists**
+- **Test Risk Score API**
+
 *   Helper utility to login, retrieve tokens, and upload your local files to verify Spiral, Voice, and Brain models interactively.
 
 ---
@@ -119,10 +133,8 @@ parkinson_detection_system/
 ├── tests/                      # Consolidated Website Tests
 ├── media/                      # User Uploads (Git-ignored)
 ├── parkinson_detection_system/ # Project Settings
-├── verify_system.py            # Master Verification Script
+├── verify_system_script.py     # Master Verification Script
 ├── interactive_api_test.py     # Interactive Manual Testing Tool
-├── recover_spiral_model.py     # Spiral Model Recovery Utility
-├── recover_brain_model.py      # Brain Model Recovery Utility
 ├── manage.py                   # Django CLI
 ├── requirements.txt            # Pinned Dependencies
 └── API_REFERENCE.md            # API Documentation

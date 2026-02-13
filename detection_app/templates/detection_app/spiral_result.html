@@ -217,16 +217,8 @@
       </div>
     </div>
 
-    <div class="section">
-      <h3>Find a Doctor Near You</h3>
-      <div class="map-container">
-        <iframe
-          src="https://www.google.com/maps?q=neurologist+near+me&output=embed"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-      </div>
-    </div>
+      <!-- Dynamic Map Section -->
+      {% include "detection_app/includes/map_logic.html" with result=result %}
 
   {% else %}
 

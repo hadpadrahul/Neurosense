@@ -1,0 +1,86 @@
+{% extends 'detection_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 text-center">Privacy Policy</h1>
+        <p class="text-gray-600 text-center mb-10">Last updated: {% now "F j, Y" %}</p>
+
+        <div class="space-y-8 text-gray-700 leading-relaxed">
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3">1. Introduction</h2>
+                <p>
+                    Welcome to NeuroSense. We are committed to protecting your personal information and your right to privacy. 
+                    If you have any questions or concerns about this privacy notice or our practices with regard to your personal information, 
+                    please contact us.
+                </p>
+                <p class="mt-2">
+                    When you use our application and website, you trust us with your personal data. We take your privacy very seriously. 
+                    In this privacy notice, we verify to you clearly what information we collect, how we use it, and what rights you have in relation to it.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3">2. Information We Collect</h2>
+                <p>We collect personal information that you provide to us directly:</p>
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li><strong>Personal Identity:</strong> Name, email address, and contact details provided during registration.</li>
+                    <li><strong>Health Data:</strong> Assessment inputs (quiz answers), audio recordings (voice analysis), images (spiral drawings, MRI scans).</li>
+                    <li><strong>Usage Data:</strong> Information about how you use our application, including access times and feature usage.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3">3. How We Use Your Information</h2>
+                <p>We use your personal information for the following purposes:</p>
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li>To provide the diagnostic services and generate assessment results.</li>
+                    <li>To maintain and improve the performance of our models (data is anonymized for this purpose).</li>
+                    <li>To communicate with you regarding your account or security updates.</li>
+                    <li>To ensure the security of our platform and prevent fraud.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3">4. Data Sharing and Disclosure</h2>
+                <p>
+                    <strong>We do not share your private data with third parties</strong> for marketing or advertising purposes. 
+                    We may disclose your information where we are legally required to do so in order to comply with applicable law, 
+                    governmental requests, a judicial proceeding, court order, or legal process.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3">5. Data Security</h2>
+                <p>
+                    We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. 
+                    However, please also remember that we cannot guarantee that the internet itself is 100% secure. Although we will do our best to protect your personal information, 
+                    transmission of personal information to and from our App is at your own risk.
+                </p>
+            </section>
+
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3">6. Your Privacy Rights</h2>
+                <p>
+                    You have the right to request access to the personal information we collect from you, change that information, or delete it (subject to certain legal exceptions). 
+                    To request to review, update, or delete your personal information, please contact our support team.
+                </p>
+            </section>
+            
+            <section>
+                <h2 class="text-xl font-bold text-gray-900 mb-3">7. Contact Us</h2>
+                <p>
+                    If you have questions or comments about this policy, you may email us at <a href="mailto:support@neurosense.ai" class="text-purple-600 hover:text-purple-800 font-semibold">support@neurosense.ai</a>.
+                </p>
+            </section>
+        </div>
+
+        <div class="mt-12 text-center">
+            <a href="{% url 'home' %}" class="inline-block bg-gray-900 text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800 transition duration-300 shadow-lg">
+                Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

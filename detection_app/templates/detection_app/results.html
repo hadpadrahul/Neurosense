@@ -581,6 +581,9 @@
                 </div>
             </div>
         
+            <!-- Nearby Specialists Map (Shows only if Parkinson/Stage detected) -->
+            {% include "detection_app/includes/map_logic.html" with result=potential_stage %}
+
             {# NEW: Consolation and Relaxation Section #}
             <div class="consolation-card">
                 <span class="consolation-icon">💖</span> {# Cute heart icon #}

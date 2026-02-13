@@ -2,241 +2,231 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Speech Recognition Result</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <title>Voice Analysis Report</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
-    html, body {
+    body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      background: #0f0c29;
+      background: radial-gradient(circle at top, #1b1f3b, #0b0d1a);
       font-family: 'Poppins', sans-serif;
-      height: 100vh;
     }
 
-    .container {
-      position: relative;
-      z-index: 2;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
-
-    .card {
-      position: relative;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(25px);
-      border-radius: 22px;
-      padding: 50px 30px;
-      text-align: center;
-      color: #fff;
-      width: 460px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
-      animation: floatCard 5s ease-in-out infinite alternate;
-      overflow: hidden;
-      border: 2px solid rgba(255,255,255,0.07);
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, #00ffe7, #ff0080, #ffd166, #7928ca);
-      background-size: 400% 400%;
-      animation: borderShift 6s ease infinite;
-      z-index: 0;
-      filter: blur(12px);
-      opacity: 0.4;
-      border-radius: 25px;
-    }
-
-    .card:hover::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 70%);
-      animation: pulseRipple 0.8s ease-out;
-      border-radius: 22px;
-      z-index: 1;
-    }
-
-    @keyframes borderShift {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-
-    @keyframes pulseRipple {
-      0% {opacity: 0.4;}
-      100% {opacity: 0;}
-    }
-
-    @keyframes floatCard {
-      0% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(-10px) scale(1.03); }
-    }
-
-    .card h2 {
-      font-size: 28px;
-      color: #ffd166;
-      margin-bottom: 20px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .result-display {
-      font-size: 22px;
-      color: #00ff00;
-      margin-bottom: 25px;
-      position: relative;
-      z-index: 2;
-      word-wrap: break-word;
-    }
-
-    .advice-section {
-      text-align: left;
-      margin-top: 10px;
-      padding-top: 10px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .advice-section h3 {
-      color: #ffd166;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-
-    .advice-section ul {
-      list-style-type: disc;
-      padding-left: 20px;
-      font-size: 14px;
+    /* ===== A4 PAGE ===== */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
       color: #ffffff;
+      padding: 25mm 22mm;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
     }
 
-    .advice-section ul li {
-      margin-bottom: 10px;
-      line-height: 1.5;
+    h1 {
+      text-align: center;
+      font-size: 26px;
+      margin-bottom: 6px;
+      color: #ffd166;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 14px;
+      margin-bottom: 30px;
+      color: #d0d0d0;
+    }
+
+    .section {
+      margin-bottom: 26px;
+    }
+
+    .section h3 {
+      font-size: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      color: #ffd166;
+    }
+
+    .info {
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .result-box {
+      border: 2px solid #ffd166;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 12px;
+      background: rgba(255,209,102,0.1);
+    }
+
+    .note {
+      font-size: 14px;
+      line-height: 1.8;
+      background: rgba(255,255,255,0.08);
+      padding: 14px;
+      border-left: 4px solid #ffd166;
+      border-radius: 8px;
+    }
+
+    /* ===== MAP ===== */
+    .map-container {
+      width: 100%;
+      height: 280px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .actions {
+      text-align: center;
+      margin-top: 30px;
     }
 
     .btn {
-      padding: 14px 34px;
-      border: none;
+      padding: 10px 26px;
+      font-size: 14px;
       border-radius: 30px;
+      border: none;
       background: #ffd166;
-      color: #333;
-      font-size: 16px;
+      color: #000;
       cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 20px;
-      position: relative;
-      z-index: 2;
+      margin: 5px;
       text-decoration: none;
       display: inline-block;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    
+    .btn:hover {
+        transform: scale(1.05);
     }
 
-    .btn:hover {
-      background: #ff9f1c;
-      transform: scale(1.05);
+    /* ===== PRINT SETTINGS ===== */
+    @media print {
+        body { background: white; }
+        .page {
+            background: white;
+            color: black;
+            box-shadow: none;
+            margin: 0;
+            border-radius: 0;
+        }
+        h1, .section h3 { color: black; }
+        .note, .result-box {
+            color: black;
+            background: #f3f3f3;
+            border-color: black;
+        }
+        .actions,
+        .map-container {
+            display: none;
+        }
     }
   </style>
 </head>
+
 <body>
 
-<!-- Back Button -->
-<!-- Back Button -->
-<a href="{% url 'home' %}" style="
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 999;
-  background-color: #FFD166;
-  padding: 10px 20px;
-  border-radius: 30px;
-  color: black;
-  text-decoration: none;
-  font-weight: 600;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-  ⬅ Back to Home
-</a>
+<div class="page">
 
-<canvas id="blob"></canvas>
+  <h1>Voice Analysis Report</h1>
+  <div class="subtitle">Vocal Biomarker Screening</div>
 
-<div class="container">
-  <div class="card">
-    <h2>Voice Assessment Result</h2>
-    <div class="result-display">
-      <p><strong>Result:</strong> {{ prediction_result }}</p>
+  <!-- Test Info -->
+  <div class="section">
+    <h3>Test Details</h3>
+    <div class="info">
+      <strong>Date:</strong> {% now "d M Y, h:i A" %}<br>
+      <strong>Test Type:</strong> Voice Frequency & Jitter Analysis
     </div>
-
-    <!-- Advice Section -->
-    <div class="advice-section">
-      <h3>Next Steps & Advice:</h3>
-      <ul>
-        <li>Your voice characteristics appear to be within the healthy range for Parkinson’s related changes.</li>
-        <li>Maintain a healthy lifestyle, including regular exercise and a balanced diet.</li>
-        <li>Continue to monitor your health and consult a doctor if you notice any unusual changes in your voice or other symptoms.</li>
-        <li>This assessment is for informational purposes only and is not a substitute for professional medical advice.</li>
-      </ul>
-    </div>
-
-    <a href="{% url 'voice_upload' %}" class="btn">Upload New Sample</a>
   </div>
+
+  <!-- Result -->
+  <div class="section">
+    <h3>Your Result</h3>
+    <div class="result-box">
+      {{ prediction_result }}
+    </div>
+  </div>
+
+  <!-- CONDITIONAL CONTENT -->
+  {% if "Invalid" in prediction_result or "Error" in prediction_result %}
+
+    <!-- Invalid / Error / Model Failure Message -->
+    <div class="section">
+      <h3>Message</h3>
+      <div class="note" style="border-left-color: #ff4d4d; background: rgba(255, 77, 77, 0.1);">
+        {{ prediction_result }}
+        <br><br>
+        Please ensure the recording is clear and free of background noise.
+      </div>
+    </div>
+
+  {% elif "Parkinson" in prediction_result %}
+
+    <!-- Parkinson Info -->
+    <div class="section">
+      <h3>What Does This Mean?</h3>
+      <div class="note">
+        Voice analysis detected vocal patterns (jitter, shimmer, or fundamental frequency anomalies) 
+        that are often present in early stages of Parkinson's.
+        <br><br>
+        <strong>This is only a screening result.</strong>
+        It does not confirm a medical diagnosis.
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>What Should You Do Next?</h3>
+      <div class="note">
+        We strongly recommend that you consult a
+        <strong>neurologist</strong>
+        for a clinical evaluation.
+      </div>
+    </div>
+
+      <!-- Dynamic Map Section -->
+      {% include "detection_app/includes/map_logic.html" with result=prediction_result %}
+
+  {% else %}
+
+    <!-- Healthy Message -->
+    <div class="section">
+      <h3>Message</h3>
+      <div class="note" style="border-left-color: #6bff6b;">
+        Your voice recording appears healthy.
+        No significant indicators of Parkinson’s-related vocal changes were found.
+        <br><br>
+        Maintain a healthy lifestyle and continue regular check-ups.
+      </div>
+    </div>
+
+  {% endif %}
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn" onclick="window.print()">Print / Save Report</button>
+    <a href="{% url 'voice_upload' %}" class="btn">Test Again</a>
+    <a href="{% url 'home' %}" class="btn">Back to Home</a>
+  </div>
+
 </div>
-
-<script>
-  const canvas = document.getElementById("blob");
-  const ctx = canvas.getContext("2d");
-
-  let w = canvas.width = window.innerWidth;
-  let h = canvas.height = window.innerHeight;
-
-  let time = 0;
-
-  function animate() {
-    ctx.clearRect(0, 0, w, h);
-
-    let gradient = ctx.createRadialGradient(w/2, h/2, 100, w/2, h/2, 600);
-    gradient.addColorStop(0, 'rgba(0,255,255,0.12)');
-    gradient.addColorStop(0.5, 'rgba(255,0,128,0.06)');
-    gradient.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.beginPath();
-    for(let i = 0; i < Math.PI * 2; i += 0.02){
-      let x = w/2 + Math.cos(i) * (160 + Math.sin(time + i * 8) * 35);
-      let y = h/2 + Math.sin(i) * (160 + Math.sin(time + i * 8) * 35);
-      ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(255, 209, 102, 0.05)';
-    ctx.fill();
-
-    time += 0.005;
-    requestAnimationFrame(animate);
-  }
-
-  animate();
-
-  window.addEventListener("resize", () => {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-  });
-</script>
 
 </body>
 </html>

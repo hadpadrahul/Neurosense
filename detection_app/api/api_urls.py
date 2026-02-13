@@ -11,6 +11,8 @@ from .api_views import (
     ChangePasswordAPIView,
     PasswordResetRequestAPIView,
     PasswordResetConfirmAPIView,
+    NearbySpecialistsView,
+    RiskScoreAPIView,
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -24,6 +26,7 @@ urlpatterns = [
     path('assessments/brain/', BrainAssessmentAPIView.as_view(), name='api_brain_assessment'),
     
     path('history/', UnifiedHistoryAPIView.as_view(), name='api_history'),
+    path('risk-score/', RiskScoreAPIView.as_view(), name='api_risk_score'),
     
     # Auth
     path('register/', RegisterAPIView.as_view(), name='api_register'),
@@ -34,4 +37,6 @@ urlpatterns = [
     path('logout/', LogoutAPIView.as_view(), name='api_logout'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # Location service
+    path('nearby-specialists/', NearbySpecialistsView.as_view(), name='api_nearby_specialists'),
 ]

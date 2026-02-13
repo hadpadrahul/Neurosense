@@ -217,3 +217,76 @@ These routes render HTML pages for browser usage.
         }
     ]
     ```
+
+---
+
+
+---
+
+### 6.1 Get Risk Score
+**Endpoint:** `GET /api/v1/risk-score/`
+**Auth Required:** Yes (JWT)
+
+**Response:**
+```json
+{
+    "risk_percentage": 45.0,
+    "message": "Risk score based on latest assessments.",
+    "components": {
+        "quiz": {"score": 20, "available": true},
+        "spiral": {"score": 100, "available": true},
+        "voice": {"score": 0, "available": true},
+        "brain": {"score": 0, "available": false}
+    }
+}
+```
+**Notes:** 
+- Calculates weighted average of latest results.
+- `risk_percentage` is between 0 and 100.
+- `components` breakdown showing individual test scores (0-100) and availability.
+
+---
+
+### Nearby Specialists (Maps Feature)
+This feature allows the frontend to display a map of nearby neurologists and healthcare facilities.
+
+#### Usage Context
+**Frontend Note:** This endpoint should be triggered **automatically** when any assessment (Quiz, Spiral, Voice, Brain) returns a positive result (e.g., "Parkinson Detected", "Stage 1-5"). It provides immediate, actionable "Next Steps" for the user.
+
+#### Find Specialists
+*   **URL:** `/api/v1/nearby-specialists/`
+*   **Method:** `POST`
+*   **Permissions:** `AllowAny` (No token required)
+*   **Headers:** `Content-Type: application/json`
+*   **Body:**
+    ```json
+    {
+        "lat": 19.9975,   // User's Latitude (Float)
+        "lon": 73.7898    // User's Longitude (Float)
+    }
+    ```
+*   **Response (200 OK):**
+    Returns a list of location objects.
+    ```json
+    [
+        {
+            "name": "City Care Hospital",
+            "lat": 19.9980,
+            "lon": 73.7900,
+            "type": "hospital",
+            "distance_km": 0.5,
+            "address": "Mahatma Gandhi Road, Nashik"
+        },
+        {
+            "name": "Dr. Sharma Neurology Clinic",
+            "lat": 19.9960,
+            "lon": 73.7850,
+            "type": "clinic",
+            "distance_km": 1.2,
+            "address": "College Road, Nashik"
+        }
+    ]
+    ```
+*   **Error Responses:**
+    *   `400 Bad Request`: If `lat` or `lon` are missing.
+    *   `500 Internal Server Error`: If the specific location service (Overpass API) fails.

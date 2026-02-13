@@ -1,6 +1,8 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.shortcuts import get_object_or_404
 from django.db.models import F
@@ -47,6 +49,12 @@ from .services.prediction_service import (
     is_valid_mri_wrapper
 )
 
+import datetime
+
+def log_api(message):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{timestamp}] [API] {message}")
+
 # ----------------- Authentication -----------------
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -54,6 +62,7 @@ class RegisterAPIView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
 
     def post(self, request, *args, **kwargs):
+        log_api(f"Registration request for username: {request.data.get('username')}")
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -369,3 +378,36 @@ class UnifiedHistoryAPIView(generics.ListAPIView):
         return Response(serializer.data)
 
 
+class NearbySpecialistsView(APIView):
+    """
+    API View to fetch nearby specialists based on lat/lon.
+    """
+    permission_classes = [AllowAny] # Allow frontend to call generic location service easily
+
+    def post(self, request):
+        lat = request.data.get('lat')
+        lon = request.data.get('lon')
+        
+        if not lat or not lon:
+            return Response({"error": "Latitude and Longitude required"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            from detection_app.services.location_service import find_nearby_specialists
+            specialists = find_nearby_specialists(lat, lon)
+            return Response(specialists, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class RiskScoreAPIView(APIView):
+    """
+    API View to calculate and return the consolidated risk score based on latest assessments.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from .services.prediction_service import calculate_risk_score
+        try:
+            risk_data = calculate_risk_score(request.user)
+            return Response(risk_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
