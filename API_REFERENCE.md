@@ -1,6 +1,6 @@
 # API & Route Reference
 **Application:** Neurosense (Parkinson's Detection)
-**Base URL:** `http://http://127.0.0.1:8000`
+**Base URL:** `http://127.0.0.1:8000`
 
 ---
 
